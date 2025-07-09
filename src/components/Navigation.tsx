@@ -30,9 +30,9 @@ const Navigation = () => {
   }
 
   return (
-    <Card className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 shadow-lg bg-white/95 backdrop-blur-sm">
-      <CardContent className="p-3">
-        <div className="flex space-x-2">
+    <Card className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 shadow-elegant-xl bg-surface-elevated/95 backdrop-blur-lg border-0 rounded-2xl animate-slide-up">
+      <CardContent className="p-4">
+        <div className="flex space-x-3">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -43,12 +43,14 @@ const Navigation = () => {
                 variant={isActive ? "default" : "ghost"}
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className={`flex flex-col items-center p-3 h-auto ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-gray-100'
-                }`}
+                className={`flex flex-col items-center p-4 h-auto rounded-xl transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-gradient-primary text-white shadow-glow scale-105' 
+                    : 'hover:bg-accent hover:scale-105 text-muted-foreground hover:text-foreground'
+                } border-0`}
               >
-                <Icon className="w-5 h-5 mb-1" />
-                <span className="text-xs">{item.label}</span>
+                <Icon className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">{item.label}</span>
               </Button>
             );
           })}
