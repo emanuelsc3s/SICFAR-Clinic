@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +14,7 @@ import {
   Pill, 
   Calendar, 
   Save, 
-  Print, 
+  Printer, 
   Search,
   Plus,
   History,
@@ -230,7 +229,7 @@ const Prontuario = () => {
                     Salvar
                   </Button>
                   <Button onClick={handlePrintRecord} variant="outline" className="text-white border-white hover:bg-white/10">
-                    <Print className="w-4 h-4 mr-2" />
+                    <Printer className="w-4 h-4 mr-2" />
                     Imprimir
                   </Button>
                 </div>
