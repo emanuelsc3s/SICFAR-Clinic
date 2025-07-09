@@ -1,9 +1,17 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueueProvider } from "@/context/QueueContext";
+import Navigation from "@/components/Navigation";
 import Index from "./pages/Index";
+import Tablet from "./pages/Tablet";
+import Triagem from "./pages/Triagem";
+import TV from "./pages/TV";
+import Medico from "./pages/Medico";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -13,13 +21,22 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <QueueProvider>
+        <BrowserRouter>
+          <div className="relative min-h-screen">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/tablet" element={<Tablet />} />
+              <Route path="/triagem" element={<Triagem />} />
+              <Route path="/tv" element={<TV />} />
+              <Route path="/medico" element={<Medico />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Navigation />
+          </div>
+        </BrowserRouter>
+      </QueueProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
