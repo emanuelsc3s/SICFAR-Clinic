@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,27 +124,45 @@ const Prontuario = () => {
   const currentPatient = samplePatients.find(p => p.id === selectedPatient);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted p-6 font-inter">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <FileText className="w-12 h-12 text-primary mr-4" />
-            <h1 className="text-5xl font-bold text-primary">PRONTUÁRIO ELETRÔNICO</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <FileText className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Prontuário Eletrônico</h1>
+                <p className="text-sm text-gray-600">Sistema de Atendimento Médico</p>
+              </div>
+            </div>
+            {selectedPatient && (
+              <div className="flex gap-3">
+                <Button onClick={handleSaveRecord} className="bg-green-600 hover:bg-green-700">
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar
+                </Button>
+                <Button onClick={handlePrintRecord} variant="outline">
+                  <Printer className="w-4 h-4 mr-2" />
+                  Imprimir
+                </Button>
+              </div>
+            )}
           </div>
-          <p className="text-xl text-muted-foreground">Sistema de Atendimento Médico</p>
         </div>
+      </header>
 
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Seleção de Paciente */}
-        <Card className="mb-6 shadow-lg">
-          <CardHeader className="bg-primary text-white">
-            <CardTitle className="flex items-center">
-              <Search className="mr-2" />
+        <Card className="bg-white shadow-sm mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+              <Search className="mr-2 w-5 h-5" />
               Seleção de Paciente
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex gap-4 mb-4">
+          <CardContent>
+            <div className="flex gap-4 mb-6">
               <Input
                 placeholder="Buscar paciente por nome ou crachá..."
                 value={searchTerm}
@@ -159,18 +178,18 @@ const Prontuario = () => {
               {samplePatients.map((patient) => (
                 <Card 
                   key={patient.id} 
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedPatient === patient.id ? 'ring-2 ring-primary bg-primary/5' : ''
+                  className={`cursor-pointer transition-all hover:shadow-md border ${
+                    selectedPatient === patient.id ? 'ring-2 ring-blue-500 bg-blue-50' : 'bg-white'
                   }`}
                   onClick={() => setSelectedPatient(patient.id)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-lg">{patient.name}</h3>
+                      <h3 className="font-semibold text-gray-900">{patient.name}</h3>
                       <Badge variant="outline">{patient.employeeBadge}</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">CPF: {patient.cpf}</p>
-                    <p className="text-sm text-muted-foreground">{patient.phone}</p>
+                    <p className="text-sm text-gray-600 mb-1">CPF: {patient.cpf}</p>
+                    <p className="text-sm text-gray-600">{patient.phone}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -180,34 +199,34 @@ const Prontuario = () => {
 
         {/* Informações do Paciente Selecionado */}
         {currentPatient && (
-          <Card className="mb-6 shadow-lg">
-            <CardHeader className="bg-success text-white">
-              <CardTitle className="flex items-center">
-                <User className="mr-2" />
+          <Card className="bg-white shadow-sm mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                <User className="mr-2 w-5 h-5" />
                 Dados do Paciente
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label className="font-semibold">Nome Completo</Label>
-                  <p className="text-lg">{currentPatient.name}</p>
+                  <Label className="text-sm font-medium text-gray-600">Nome Completo</Label>
+                  <p className="text-base font-medium text-gray-900">{currentPatient.name}</p>
                 </div>
                 <div>
-                  <Label className="font-semibold">Data de Nascimento</Label>
-                  <p className="text-lg">{new Date(currentPatient.birthDate).toLocaleDateString('pt-BR')}</p>
+                  <Label className="text-sm font-medium text-gray-600">Data de Nascimento</Label>
+                  <p className="text-base font-medium text-gray-900">{new Date(currentPatient.birthDate).toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div>
-                  <Label className="font-semibold">Telefone</Label>
-                  <p className="text-lg">{currentPatient.phone}</p>
+                  <Label className="text-sm font-medium text-gray-600">Telefone</Label>
+                  <p className="text-base font-medium text-gray-900">{currentPatient.phone}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <Label className="font-semibold">Endereço</Label>
-                  <p className="text-lg">{currentPatient.address}</p>
+                  <Label className="text-sm font-medium text-gray-600">Endereço</Label>
+                  <p className="text-base font-medium text-gray-900">{currentPatient.address}</p>
                 </div>
                 <div>
-                  <Label className="font-semibold">Crachá</Label>
-                  <p className="text-lg">{currentPatient.employeeBadge}</p>
+                  <Label className="text-sm font-medium text-gray-600">Crachá</Label>
+                  <p className="text-base font-medium text-gray-900">{currentPatient.employeeBadge}</p>
                 </div>
               </div>
             </CardContent>
@@ -216,28 +235,16 @@ const Prontuario = () => {
 
         {/* Formulário de Prontuário */}
         {selectedPatient && (
-          <Card className="shadow-lg">
-            <CardHeader className="bg-accent text-white">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <Stethoscope className="mr-2" />
-                  Atendimento Médico
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button onClick={handleSaveRecord} className="bg-success hover:bg-success/90">
-                    <Save className="w-4 h-4 mr-2" />
-                    Salvar
-                  </Button>
-                  <Button onClick={handlePrintRecord} variant="outline" className="text-white border-white hover:bg-white/10">
-                    <Printer className="w-4 h-4 mr-2" />
-                    Imprimir
-                  </Button>
-                </div>
-              </div>
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                <Stethoscope className="mr-2 w-5 h-5" />
+                Atendimento Médico
+              </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent>
               <Tabs defaultValue="anamnese" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-5 mb-6">
                   <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
                   <TabsTrigger value="sinais">Sinais Vitais</TabsTrigger>
                   <TabsTrigger value="exame">Exame Físico</TabsTrigger>
@@ -245,10 +252,10 @@ const Prontuario = () => {
                   <TabsTrigger value="prescricao">Prescrição</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="anamnese" className="space-y-6 mt-6">
+                <TabsContent value="anamnese" className="space-y-6">
                   <div className="grid gap-6">
                     <div>
-                      <Label htmlFor="complaints" className="text-base font-semibold">Queixa Principal</Label>
+                      <Label htmlFor="complaints" className="text-sm font-medium text-gray-700">Queixa Principal</Label>
                       <Textarea
                         id="complaints"
                         placeholder="Descreva a queixa principal do paciente..."
@@ -260,7 +267,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="currentHistory" className="text-base font-semibold">História da Doença Atual</Label>
+                      <Label htmlFor="currentHistory" className="text-sm font-medium text-gray-700">História da Doença Atual</Label>
                       <Textarea
                         id="currentHistory"
                         placeholder="Descreva a evolução dos sintomas..."
@@ -273,7 +280,7 @@ const Prontuario = () => {
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="pastHistory" className="text-base font-semibold">Antecedentes Pessoais</Label>
+                        <Label htmlFor="pastHistory" className="text-sm font-medium text-gray-700">Antecedentes Pessoais</Label>
                         <Textarea
                           id="pastHistory"
                           placeholder="Doenças anteriores, cirurgias..."
@@ -285,7 +292,7 @@ const Prontuario = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="familyHistory" className="text-base font-semibold">Antecedentes Familiares</Label>
+                        <Label htmlFor="familyHistory" className="text-sm font-medium text-gray-700">Antecedentes Familiares</Label>
                         <Textarea
                           id="familyHistory"
                           placeholder="Histórico familiar de doenças..."
@@ -299,7 +306,7 @@ const Prontuario = () => {
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="medications" className="text-base font-semibold">Medicações em Uso</Label>
+                        <Label htmlFor="medications" className="text-sm font-medium text-gray-700">Medicações em Uso</Label>
                         <Textarea
                           id="medications"
                           placeholder="Liste as medicações atuais..."
@@ -311,7 +318,7 @@ const Prontuario = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="allergies" className="text-base font-semibold">Alergias</Label>
+                        <Label htmlFor="allergies" className="text-sm font-medium text-gray-700">Alergias</Label>
                         <Textarea
                           id="allergies"
                           placeholder="Alergias conhecidas..."
@@ -325,10 +332,10 @@ const Prontuario = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="sinais" className="space-y-6 mt-6">
+                <TabsContent value="sinais" className="space-y-6">
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="bp" className="text-base font-semibold">Pressão Arterial</Label>
+                      <Label htmlFor="bp" className="text-sm font-medium text-gray-700">Pressão Arterial</Label>
                       <Input
                         id="bp"
                         placeholder="120/80 mmHg"
@@ -342,7 +349,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="hr" className="text-base font-semibold">Frequência Cardíaca</Label>
+                      <Label htmlFor="hr" className="text-sm font-medium text-gray-700">Frequência Cardíaca</Label>
                       <Input
                         id="hr"
                         placeholder="72 bpm"
@@ -356,7 +363,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="temp" className="text-base font-semibold">Temperatura</Label>
+                      <Label htmlFor="temp" className="text-sm font-medium text-gray-700">Temperatura</Label>
                       <Input
                         id="temp"
                         placeholder="36.5°C"
@@ -370,7 +377,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="rr" className="text-base font-semibold">Freq. Respiratória</Label>
+                      <Label htmlFor="rr" className="text-sm font-medium text-gray-700">Freq. Respiratória</Label>
                       <Input
                         id="rr"
                         placeholder="16 irpm"
@@ -384,7 +391,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="sat" className="text-base font-semibold">Saturação O2</Label>
+                      <Label htmlFor="sat" className="text-sm font-medium text-gray-700">Saturação O2</Label>
                       <Input
                         id="sat"
                         placeholder="98%"
@@ -398,7 +405,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="weight" className="text-base font-semibold">Peso</Label>
+                      <Label htmlFor="weight" className="text-sm font-medium text-gray-700">Peso</Label>
                       <Input
                         id="weight"
                         placeholder="70 kg"
@@ -413,9 +420,9 @@ const Prontuario = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="exame" className="space-y-6 mt-6">
+                <TabsContent value="exame" className="space-y-6">
                   <div>
-                    <Label htmlFor="physicalExam" className="text-base font-semibold">Exame Físico</Label>
+                    <Label htmlFor="physicalExam" className="text-sm font-medium text-gray-700">Exame Físico</Label>
                     <Textarea
                       id="physicalExam"
                       placeholder="Descreva os achados do exame físico por sistemas..."
@@ -427,10 +434,10 @@ const Prontuario = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="diagnostico" className="space-y-6 mt-6">
+                <TabsContent value="diagnostico" className="space-y-6">
                   <div className="grid gap-6">
                     <div>
-                      <Label htmlFor="diagnosis" className="text-base font-semibold">Diagnóstico</Label>
+                      <Label htmlFor="diagnosis" className="text-sm font-medium text-gray-700">Diagnóstico</Label>
                       <Textarea
                         id="diagnosis"
                         placeholder="Diagnóstico principal e diagnósticos diferenciais..."
@@ -442,7 +449,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="treatment" className="text-base font-semibold">Plano Terapêutico</Label>
+                      <Label htmlFor="treatment" className="text-sm font-medium text-gray-700">Plano Terapêutico</Label>
                       <Textarea
                         id="treatment"
                         placeholder="Tratamento proposto..."
@@ -454,7 +461,7 @@ const Prontuario = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="followUp" className="text-base font-semibold">Acompanhamento</Label>
+                      <Label htmlFor="followUp" className="text-sm font-medium text-gray-700">Acompanhamento</Label>
                       <Textarea
                         id="followUp"
                         placeholder="Orientações e retorno..."
@@ -467,9 +474,9 @@ const Prontuario = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="prescricao" className="space-y-6 mt-6">
+                <TabsContent value="prescricao" className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Prescrições</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Prescrições</h3>
                     <Button onClick={addPrescription} variant="outline">
                       <Plus className="w-4 h-4 mr-2" />
                       Adicionar Medicação
@@ -477,69 +484,71 @@ const Prontuario = () => {
                   </div>
 
                   {prescriptions.map((prescription, index) => (
-                    <Card key={prescription.id} className="p-4">
-                      <div className="grid gap-4">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-base font-semibold">Medicação {index + 1}</Label>
-                          <Badge variant="outline">
-                            <Pill className="w-3 h-3 mr-1" />
-                            Prescrição
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <Label>Medicamento</Label>
-                            <Input
-                              placeholder="Nome do medicamento"
-                              value={prescription.medication}
-                              onChange={(e) => updatePrescription(prescription.id, 'medication', e.target.value)}
-                              className="mt-1"
-                            />
+                    <Card key={prescription.id} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="grid gap-4">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium text-gray-700">Medicação {index + 1}</Label>
+                            <Badge variant="outline">
+                              <Pill className="w-3 h-3 mr-1" />
+                              Prescrição
+                            </Badge>
                           </div>
-                          <div>
-                            <Label>Dosagem</Label>
-                            <Input
-                              placeholder="Ex: 500mg"
-                              value={prescription.dosage}
-                              onChange={(e) => updatePrescription(prescription.id, 'dosage', e.target.value)}
-                              className="mt-1"
-                            />
+                          
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-600">Medicamento</Label>
+                              <Input
+                                placeholder="Nome do medicamento"
+                                value={prescription.medication}
+                                onChange={(e) => updatePrescription(prescription.id, 'medication', e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium text-gray-600">Dosagem</Label>
+                              <Input
+                                placeholder="Ex: 500mg"
+                                value={prescription.dosage}
+                                onChange={(e) => updatePrescription(prescription.id, 'dosage', e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <Label>Frequência</Label>
-                            <Input
-                              placeholder="Ex: 8/8h"
-                              value={prescription.frequency}
-                              onChange={(e) => updatePrescription(prescription.id, 'frequency', e.target.value)}
-                              className="mt-1"
-                            />
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-600">Frequência</Label>
+                              <Input
+                                placeholder="Ex: 8/8h"
+                                value={prescription.frequency}
+                                onChange={(e) => updatePrescription(prescription.id, 'frequency', e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium text-gray-600">Duração</Label>
+                              <Input
+                                placeholder="Ex: 7 dias"
+                                value={prescription.duration}
+                                onChange={(e) => updatePrescription(prescription.id, 'duration', e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <Label>Duração</Label>
-                            <Input
-                              placeholder="Ex: 7 dias"
-                              value={prescription.duration}
-                              onChange={(e) => updatePrescription(prescription.id, 'duration', e.target.value)}
-                              className="mt-1"
-                            />
-                          </div>
-                        </div>
 
-                        <div>
-                          <Label>Instruções</Label>
-                          <Textarea
-                            placeholder="Instruções de uso..."
-                            value={prescription.instructions}
-                            onChange={(e) => updatePrescription(prescription.id, 'instructions', e.target.value)}
-                            className="mt-1"
-                            rows={2}
-                          />
+                          <div>
+                            <Label className="text-sm font-medium text-gray-600">Instruções</Label>
+                            <Textarea
+                              placeholder="Instruções de uso..."
+                              value={prescription.instructions}
+                              onChange={(e) => updatePrescription(prescription.id, 'instructions', e.target.value)}
+                              className="mt-1"
+                              rows={2}
+                            />
+                          </div>
                         </div>
-                      </div>
+                      </CardContent>
                     </Card>
                   ))}
                 </TabsContent>

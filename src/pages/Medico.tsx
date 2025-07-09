@@ -72,65 +72,72 @@ const Medico = () => {
   const consultingRooms = ['1', '2', '3', '4', '5'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 font-inter">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Stethoscope className="w-12 h-12 text-primary mr-4" />
-            <h1 className="text-5xl font-bold text-primary">ÁREA MÉDICA</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Stethoscope className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Área Médica</h1>
+                <p className="text-sm text-gray-600">Painel de Atendimento Médico</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Consultório:</span>
+              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {consultingRooms.map(room => (
+                    <SelectItem key={room} value={room}>
+                      {room}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <p className="text-xl text-gray-600">Painel de Atendimento Médico</p>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Fila Pós-Triagem */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-primary text-white">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl flex items-center">
-                    <Clock className="mr-3" />
-                    Fila Pós-Triagem ({patientsForConsulting.length})
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm">Consultório:</span>
-                    <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                      <SelectTrigger className="w-24 bg-white/10 border-white/20 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {consultingRooms.map(room => (
-                          <SelectItem key={room} value={room}>
-                            {room}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Clock className="mr-2 w-5 h-5" />
+                  Fila Pós-Triagem ({patientsForConsulting.length})
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="max-h-96 overflow-y-auto">
                   {patientsForConsulting.length === 0 ? (
                     <div className="p-8 text-center text-gray-500">
-                      <User className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                      <p className="text-xl">Nenhum paciente aguardando consulta</p>
+                      <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg">Nenhum paciente aguardando consulta</p>
                     </div>
                   ) : (
                     patientsForConsulting.map((patient, index) => (
                       <div 
                         key={patient.id} 
-                        className={`p-6 border-b hover:bg-gray-50 ${index === 0 ? 'bg-blue-50' : ''}`}
+                        className={`p-4 border-b border-gray-200 hover:bg-gray-50 ${
+                          index === 0 ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                        }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <div className="text-center">
-                              <div className="text-3xl font-bold text-primary">
+                              <div className="text-2xl font-bold text-blue-600">
                                 {patient.number}
                               </div>
                               <Badge 
-                                variant={patient.type === 'priority' ? 'destructive' : 'default'}
-                                className="mt-1"
+                                variant={patient.type === 'priority' ? 'destructive' : 'secondary'}
+                                className="mt-1 text-xs"
                               >
                                 {patient.type === 'priority' ? (
                                   <>
@@ -147,7 +154,7 @@ const Medico = () => {
                             </div>
                             
                             <div>
-                              <p className="font-medium">Crachá: {patient.employeeBadge}</p>
+                              <p className="font-medium text-gray-900">Crachá: {patient.employeeBadge}</p>
                               <p className="text-sm text-gray-600">
                                 Triagem: {patient.calledAt ? formatTime(patient.calledAt) : '-'}
                               </p>
@@ -158,9 +165,8 @@ const Medico = () => {
                           </div>
                           
                           <Button
-                            size="lg"
                             onClick={() => callToConsulting(patient.id)}
-                            className={`${index === 0 ? 'animate-pulse-soft' : ''}`}
+                            className="bg-blue-600 hover:bg-blue-700"
                           >
                             <Phone className="w-4 h-4 mr-2" />
                             Chamar para Consultório {selectedRoom}
@@ -174,24 +180,25 @@ const Medico = () => {
             </Card>
           </div>
 
-          {/* Pacientes em Consulta */}
-          <div>
-            <Card className="shadow-lg">
-              <CardHeader className="bg-green-500 text-white">
-                <CardTitle className="text-xl flex items-center">
-                  <Stethoscope className="mr-2" />
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Pacientes em Consulta */}
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Stethoscope className="mr-2 w-5 h-5" />
                   Em Consulta ({patientsInConsulting.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
+              <CardContent>
+                <div className="space-y-3">
                   {patientsInConsulting.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">
+                    <p className="text-center text-gray-500 py-4">
                       Nenhum paciente em consulta
                     </p>
                   ) : (
                     patientsInConsulting.map((patient) => (
-                      <div key={patient.id} className="p-4 bg-green-50 rounded-lg">
+                      <div key={patient.id} className="p-3 bg-green-50 rounded-lg border border-green-200">
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <div className="text-lg font-bold text-green-700">
@@ -205,7 +212,7 @@ const Medico = () => {
                             </div>
                           </div>
                           <Badge 
-                            variant={patient.type === 'priority' ? 'destructive' : 'default'}
+                            variant={patient.type === 'priority' ? 'destructive' : 'secondary'}
                             className="text-xs"
                           >
                             {patient.type === 'priority' ? 'PRIOR' : 'NORMAL'}
@@ -226,12 +233,12 @@ const Medico = () => {
               </CardContent>
             </Card>
 
-            {/* Estatísticas por Consultório */}
-            <Card className="shadow-lg mt-6">
-              <CardHeader className="bg-gray-100">
-                <CardTitle className="text-lg">Consultórios</CardTitle>
+            {/* Consultórios */}
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">Consultórios</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent>
                 <div className="space-y-3">
                   {consultingRooms.map(room => {
                     const roomPatients = patientsInConsulting.filter(p => 
@@ -239,7 +246,7 @@ const Medico = () => {
                     );
                     return (
                       <div key={room} className="flex items-center justify-between">
-                        <span>Consultório {room}:</span>
+                        <span className="text-sm text-gray-600">Consultório {room}:</span>
                         <Badge variant={roomPatients.length > 0 ? 'default' : 'outline'}>
                           {roomPatients.length > 0 ? 'Ocupado' : 'Livre'}
                         </Badge>
@@ -250,24 +257,24 @@ const Medico = () => {
               </CardContent>
             </Card>
 
-            {/* Estatísticas Gerais */}
-            <Card className="shadow-lg mt-6">
-              <CardHeader className="bg-gray-100">
-                <CardTitle className="text-lg">Estatísticas</CardTitle>
+            {/* Estatísticas */}
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">Estatísticas</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span>Aguardando Consulta:</span>
+                    <span className="text-sm text-gray-600">Aguardando Consulta:</span>
                     <Badge variant="outline">{patientsForConsulting.length}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Em Consulta:</span>
+                    <span className="text-sm text-gray-600">Em Consulta:</span>
                     <Badge variant="default">{patientsInConsulting.length}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Atendidos Hoje:</span>
-                    <Badge variant="default">{state.stats.completedToday}</Badge>
+                    <span className="text-sm text-gray-600">Atendidos Hoje:</span>
+                    <Badge variant="secondary">{state.stats.completedToday}</Badge>
                   </div>
                 </div>
               </CardContent>

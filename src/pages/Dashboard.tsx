@@ -43,70 +43,91 @@ const Dashboard = () => {
   const efficiency = 92; // percentual simulado
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 font-inter">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <BarChart3 className="w-12 h-12 text-primary mr-4" />
-            <h1 className="text-5xl font-bold text-primary">DASHBOARD</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center">
+            <BarChart3 className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-600">Relatórios e Análises do Sistema</p>
+            </div>
           </div>
-          <p className="text-xl text-gray-600">Relatórios e Análises do Sistema</p>
         </div>
+      </header>
 
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Métricas Principais */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-lg">
-            <CardContent className="p-6 text-center">
-              <Users className="w-12 h-12 text-primary mx-auto mb-3" />
-              <div className="text-3xl font-bold text-primary mb-1">
-                {state.stats.totalToday}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Hoje</p>
+                  <p className="text-2xl font-bold text-gray-900">{state.stats.totalToday}</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">Total Hoje</div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
-            <CardContent className="p-6 text-center">
-              <Clock className="w-12 h-12 text-orange-500 mx-auto mb-3" />
-              <div className="text-3xl font-bold text-orange-500 mb-1">
-                {averageWaitTime}min
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-orange-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Tempo Médio</p>
+                  <p className="text-2xl font-bold text-gray-900">{averageWaitTime}min</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">Tempo Médio</div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
-            <CardContent className="p-6 text-center">
-              <TrendingUp className="w-12 h-12 text-green-500 mx-auto mb-3" />
-              <div className="text-3xl font-bold text-green-500 mb-1">
-                {efficiency}%
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Eficiência</p>
+                  <p className="text-2xl font-bold text-gray-900">{efficiency}%</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">Eficiência</div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
-            <CardContent className="p-6 text-center">
-              <Activity className="w-12 h-12 text-purple-500 mx-auto mb-3" />
-              <div className="text-3xl font-bold text-purple-500 mb-1">
-                {peakHour}
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Activity className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Pico de Movimento</p>
+                  <p className="text-2xl font-bold text-gray-900">{peakHour}</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">Pico de Movimento</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Gráficos */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
           {/* Gráfico de Barras - Atendimentos por Hora */}
-          <Card className="shadow-lg">
-            <CardHeader className="bg-primary text-white">
-              <CardTitle className="text-xl flex items-center">
-                <BarChart3 className="mr-2" />
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                <BarChart3 className="mr-2 w-5 h-5" />
                 Atendimentos por Hora
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={hourlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -121,14 +142,14 @@ const Dashboard = () => {
           </Card>
 
           {/* Gráfico de Pizza - Distribuição por Tipo */}
-          <Card className="shadow-lg">
-            <CardHeader className="bg-green-500 text-white">
-              <CardTitle className="text-xl flex items-center">
-                <Users className="mr-2" />
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                <Users className="mr-2 w-5 h-5" />
                 Distribuição por Tipo
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -152,17 +173,17 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Gráfico de Linha - Tendência Semanal */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* Gráfico de Linha e Status */}
+        <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-purple-500 text-white">
-                <CardTitle className="text-xl flex items-center">
-                  <TrendingUp className="mr-2" />
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <TrendingUp className="mr-2 w-5 h-5" />
                   Tendência Semanal
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={weeklyTrend}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -182,38 +203,38 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Status Atual */}
-          <div>
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gray-700 text-white">
-                <CardTitle className="text-xl flex items-center">
-                  <Calendar className="mr-2" />
+          {/* Status Atual e Alertas */}
+          <div className="space-y-6">
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Calendar className="mr-2 w-5 h-5" />
                   Status Atual
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
+              <CardContent>
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Fila Normal</span>
-                    <Badge variant="default" className="bg-green-500">
+                    <span className="text-sm text-gray-600">Fila Normal</span>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
                       {state.stats.normalQueue}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Fila Prioritária</span>
+                    <span className="text-sm text-gray-600">Fila Prioritária</span>
                     <Badge variant="destructive">
                       {state.stats.priorityQueue}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Em Atendimento</span>
+                    <span className="text-sm text-gray-600">Em Atendimento</span>
                     <Badge variant="outline">
                       {state.patients.filter(p => p.status === 'called').length}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Concluídos</span>
-                    <Badge variant="default" className="bg-blue-500">
+                    <span className="text-sm text-gray-600">Concluídos</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                       {state.stats.completedToday}
                     </Badge>
                   </div>
@@ -222,11 +243,11 @@ const Dashboard = () => {
             </Card>
 
             {/* Alertas */}
-            <Card className="shadow-lg mt-6">
-              <CardHeader className="bg-orange-500 text-white">
-                <CardTitle className="text-lg">Alertas</CardTitle>
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">Alertas</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent>
                 <div className="space-y-3">
                   {state.stats.priorityQueue > 5 && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">

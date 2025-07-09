@@ -12,7 +12,8 @@ import {
   BarChart3,
   Activity,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  FileText
 } from 'lucide-react';
 
 const Index = () => {
@@ -25,7 +26,7 @@ const Index = () => {
       description: 'Geração de senhas para pacientes',
       icon: Tablet,
       path: '/tablet',
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-blue-600 hover:bg-blue-700',
       features: ['Senhas Normal/Prioritária', 'Identificação por crachá', 'Interface touch-friendly']
     },
     {
@@ -33,7 +34,7 @@ const Index = () => {
       description: 'Painel de atendimento da triagem',
       icon: Users,
       path: '/triagem',
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'bg-green-600 hover:bg-green-700',
       features: ['Lista de pacientes', 'Chamada para triagem', 'Controle de fila']
     },
     {
@@ -41,7 +42,7 @@ const Index = () => {
       description: 'Painel de chamadas público',
       icon: Monitor,
       path: '/tv',
-      color: 'bg-purple-500 hover:bg-purple-600',
+      color: 'bg-purple-600 hover:bg-purple-700',
       features: ['Chamadas em tempo real', 'Histórico de senhas', 'Interface fullscreen']
     },
     {
@@ -49,116 +50,138 @@ const Index = () => {
       description: 'Painel médico para consultas',
       icon: Stethoscope,
       path: '/medico',
-      color: 'bg-red-500 hover:bg-red-600',
+      color: 'bg-red-600 hover:bg-red-700',
       features: ['Fila pós-triagem', 'Chamada por consultório', 'Controle de atendimento']
+    },
+    {
+      title: 'PRONTUÁRIO',
+      description: 'Sistema de prontuário eletrônico',
+      icon: FileText,
+      path: '/prontuario',
+      color: 'bg-indigo-600 hover:bg-indigo-700',
+      features: ['Anamnese completa', 'Exame físico', 'Prescrições médicas']
     },
     {
       title: 'DASHBOARD',
       description: 'Relatórios e análises',
       icon: BarChart3,
       path: '/dashboard',
-      color: 'bg-orange-500 hover:bg-orange-600',
+      color: 'bg-orange-600 hover:bg-orange-700',
       features: ['Métricas em tempo real', 'Gráficos interativos', 'Relatórios detalhados']
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle text-foreground font-inter animate-fade-in">
-      {/* Modern Header with Glass Effect */}
-      <div className="bg-card/80 backdrop-blur-xl border-b border-border p-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6 animate-scale-in">
-            <div className="p-4 bg-primary/10 rounded-2xl mr-6 shadow-glow animate-float">
-              <Activity className="w-16 h-16 text-primary" />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center">
+            <Activity className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Sistema de Senhas Ambulatoriais</h1>
+              <p className="text-sm text-gray-600">Gestão completa de filas e atendimento médico</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-              Sistema de Senhas Ambulatoriais
-            </h1>
           </div>
-          <p className="text-xl md:text-2xl text-muted-foreground font-light">
-            Gestão completa de filas e atendimento médico
-          </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto p-8">
-        {/* Estatísticas Elegantes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 animate-slide-up">
-          <Card className="bg-card backdrop-blur-lg border shadow-elegant-lg hover:shadow-glow transition-all duration-300 group">
-            <CardContent className="p-8 text-center">
-              <div className="p-3 bg-primary/10 rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-8 h-8 text-primary" />
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Hoje</p>
+                  <p className="text-2xl font-bold text-gray-900">{state.stats.totalToday}</p>
+                </div>
               </div>
-              <div className="text-4xl font-bold mb-2 text-foreground">{state.stats.totalToday}</div>
-              <div className="text-sm text-muted-foreground font-medium">Total Hoje</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card backdrop-blur-lg border shadow-elegant-lg hover:shadow-glow transition-all duration-300 group">
-            <CardContent className="p-8 text-center">
-              <div className="p-3 bg-success/10 rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Clock className="w-8 h-8 text-success" />
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Fila Normal</p>
+                  <p className="text-2xl font-bold text-gray-900">{state.stats.normalQueue}</p>
+                </div>
               </div>
-              <div className="text-4xl font-bold mb-2 text-foreground">{state.stats.normalQueue}</div>
-              <div className="text-sm text-muted-foreground font-medium">Fila Normal</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card backdrop-blur-lg border shadow-elegant-lg hover:shadow-glow transition-all duration-300 group">
-            <CardContent className="p-8 text-center">
-              <div className="p-3 bg-warning/10 rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <AlertTriangle className="w-8 h-8 text-warning" />
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Fila Prioritária</p>
+                  <p className="text-2xl font-bold text-gray-900">{state.stats.priorityQueue}</p>
+                </div>
               </div>
-              <div className="text-4xl font-bold mb-2 text-foreground">{state.stats.priorityQueue}</div>
-              <div className="text-sm text-muted-foreground font-medium">Fila Prioritária</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card backdrop-blur-lg border shadow-elegant-lg hover:shadow-glow transition-all duration-300 group">
-            <CardContent className="p-8 text-center">
-              <div className="p-3 bg-accent rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Activity className="w-8 h-8 text-accent-foreground" />
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Activity className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Atendidos</p>
+                  <p className="text-2xl font-bold text-gray-900">{state.stats.completedToday}</p>
+                </div>
               </div>
-              <div className="text-4xl font-bold mb-2 text-foreground">{state.stats.completedToday}</div>
-              <div className="text-sm text-muted-foreground font-medium">Atendidos</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Módulos Modernos */}
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
-          {modules.map((module, index) => {
+        {/* Módulos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+          {modules.map((module) => {
             const Icon = module.icon;
             return (
               <Card 
                 key={module.path} 
-                className="bg-card backdrop-blur-lg border shadow-elegant-lg hover:shadow-glow hover:bg-surface-elevated transition-all duration-500 cursor-pointer group animate-scale-in"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
                 onClick={() => navigate(module.path)}
               >
-                <CardHeader className="text-center pb-6">
-                  <div className="flex justify-center mb-6">
-                    <div className="relative p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl group-hover:scale-110 group-hover:shadow-glow transition-all duration-500">
-                      <Icon className="w-16 h-16 text-primary drop-shadow-lg" />
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-gray-100 rounded-lg mr-4 group-hover:bg-gray-200 transition-colors">
+                      <Icon className="w-8 h-8 text-gray-700" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-gray-900">{module.title}</CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">{module.description}</p>
                     </div>
                   </div>
-                  <CardTitle className="text-3xl font-bold mb-3 text-foreground">
-                    {module.title}
-                  </CardTitle>
-                  <p className="text-lg text-muted-foreground font-light leading-relaxed">{module.description}</p>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <ul className="space-y-3 mb-8">
-                    {module.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                        <div className="w-2 h-2 bg-primary/60 rounded-full mr-4 group-hover:shadow-glow transition-all duration-300"></div>
-                        <span className="text-sm font-medium">{feature}</span>
+                  <ul className="space-y-2 mb-6">
+                    {module.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></div>
+                        {feature}
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className="w-full bg-gradient-to-r from-primary/10 to-primary/5 text-foreground border border-border hover:bg-gradient-to-r hover:from-primary/20 hover:to-primary/10 hover:border-primary/30 font-semibold py-4 text-lg rounded-xl shadow-elegant-md hover:shadow-glow transition-all duration-300 backdrop-blur-sm"
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(module.path);
+                    }}
                   >
                     Acessar {module.title}
                   </Button>
@@ -168,38 +191,31 @@ const Index = () => {
           })}
         </div>
 
-        {/* Fluxo Moderno */}
-        <Card className="bg-card backdrop-blur-lg border shadow-elegant-xl animate-fade-in">
-          <CardHeader className="text-center pb-8">
-            <CardTitle className="text-4xl font-bold text-foreground">
-              Fluxo do Sistema
-            </CardTitle>
+        {/* Fluxo do Sistema */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-gray-900">Fluxo do Sistema</CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="flex flex-wrap justify-center items-center gap-6 text-lg">
-              <div className="flex items-center bg-primary/10 px-6 py-3 rounded-2xl border border-primary/20 backdrop-blur-sm shadow-elegant-md hover:shadow-glow transition-all duration-300">
-                <Tablet className="w-6 h-6 mr-3 text-primary" />
-                <span className="font-semibold text-foreground">Gerar Senha</span>
+          <CardContent>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+              <div className="flex items-center bg-blue-50 px-4 py-2 rounded-md border border-blue-200">
+                <Tablet className="w-4 h-4 mr-2 text-blue-600" />
+                <span className="font-medium text-blue-900">Gerar Senha</span>
               </div>
-              <div className="text-3xl text-muted-foreground">→</div>
-              <div className="flex items-center bg-success/10 px-6 py-3 rounded-2xl border border-success/20 backdrop-blur-sm shadow-elegant-md hover:shadow-glow transition-all duration-300">
-                <Users className="w-6 h-6 mr-3 text-success" />
-                <span className="font-semibold text-foreground">Triagem</span>
+              <div className="text-gray-400">→</div>
+              <div className="flex items-center bg-green-50 px-4 py-2 rounded-md border border-green-200">
+                <Users className="w-4 h-4 mr-2 text-green-600" />
+                <span className="font-medium text-green-900">Triagem</span>
               </div>
-              <div className="text-3xl text-muted-foreground">→</div>
-              <div className="flex items-center bg-accent px-6 py-3 rounded-2xl border border-accent/50 backdrop-blur-sm shadow-elegant-md hover:shadow-glow transition-all duration-300">
-                <Monitor className="w-6 h-6 mr-3 text-accent-foreground" />
-                <span className="font-semibold text-accent-foreground">TV Chamada</span>
+              <div className="text-gray-400">→</div>
+              <div className="flex items-center bg-purple-50 px-4 py-2 rounded-md border border-purple-200">
+                <Monitor className="w-4 h-4 mr-2 text-purple-600" />
+                <span className="font-medium text-purple-900">TV Chamada</span>
               </div>
-              <div className="text-3xl text-muted-foreground">→</div>
-              <div className="flex items-center bg-warning/10 px-6 py-3 rounded-2xl border border-warning/20 backdrop-blur-sm shadow-elegant-md hover:shadow-glow transition-all duration-300">
-                <Stethoscope className="w-6 h-6 mr-3 text-warning" />
-                <span className="font-semibold text-foreground">Consulta</span>
-              </div>
-              <div className="text-3xl text-muted-foreground">→</div>
-              <div className="flex items-center bg-secondary px-6 py-3 rounded-2xl border border-secondary/50 backdrop-blur-sm shadow-elegant-md hover:shadow-glow transition-all duration-300">
-                <Monitor className="w-6 h-6 mr-3 text-secondary-foreground" />
-                <span className="font-semibold text-secondary-foreground">Consultório</span>
+              <div className="text-gray-400">→</div>
+              <div className="flex items-center bg-red-50 px-4 py-2 rounded-md border border-red-200">
+                <Stethoscope className="w-4 h-4 mr-2 text-red-600" />
+                <span className="font-medium text-red-900">Consulta</span>
               </div>
             </div>
           </CardContent>

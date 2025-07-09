@@ -53,20 +53,28 @@ const Triagem = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 font-inter">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-primary mb-2">TRIAGEM</h1>
-          <p className="text-xl text-gray-600">Painel de Atendimento</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center">
+            <Clock className="w-8 h-8 text-blue-600 mr-3" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Triagem</h1>
+              <p className="text-sm text-gray-600">Painel de Atendimento</p>
+            </div>
+          </div>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Fila de Espera */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-primary text-white">
-                <CardTitle className="text-2xl flex items-center">
-                  <Clock className="mr-3" />
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Clock className="mr-2 w-5 h-5" />
                   Fila de Espera ({waitingPatients.length})
                 </CardTitle>
               </CardHeader>
@@ -74,24 +82,26 @@ const Triagem = () => {
                 <div className="max-h-96 overflow-y-auto">
                   {waitingPatients.length === 0 ? (
                     <div className="p-8 text-center text-gray-500">
-                      <User className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                      <p className="text-xl">Nenhum paciente na fila</p>
+                      <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg">Nenhum paciente na fila</p>
                     </div>
                   ) : (
                     waitingPatients.map((patient, index) => (
                       <div 
                         key={patient.id} 
-                        className={`p-6 border-b hover:bg-gray-50 ${index === 0 ? 'bg-blue-50' : ''}`}
+                        className={`p-4 border-b border-gray-200 hover:bg-gray-50 ${
+                          index === 0 ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                        }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <div className="text-center">
-                              <div className="text-3xl font-bold text-primary">
+                              <div className="text-2xl font-bold text-blue-600">
                                 {patient.number}
                               </div>
                               <Badge 
-                                variant={patient.type === 'priority' ? 'destructive' : 'default'}
-                                className="mt-1"
+                                variant={patient.type === 'priority' ? 'destructive' : 'secondary'}
+                                className="mt-1 text-xs"
                               >
                                 {patient.type === 'priority' ? (
                                   <>
@@ -108,7 +118,7 @@ const Triagem = () => {
                             </div>
                             
                             <div>
-                              <p className="font-medium">Crachá: {patient.employeeBadge}</p>
+                              <p className="font-medium text-gray-900">Crachá: {patient.employeeBadge}</p>
                               <p className="text-sm text-gray-600">
                                 Chegada: {formatTime(patient.timestamp)}
                               </p>
@@ -119,9 +129,8 @@ const Triagem = () => {
                           </div>
                           
                           <Button
-                            size="lg"
                             onClick={() => callPatient(patient.id)}
-                            className={`${index === 0 ? 'animate-pulse-soft' : ''}`}
+                            className="bg-blue-600 hover:bg-blue-700"
                             disabled={index !== 0}
                           >
                             <Phone className="w-4 h-4 mr-2" />
@@ -136,24 +145,25 @@ const Triagem = () => {
             </Card>
           </div>
 
-          {/* Pacientes em Atendimento */}
-          <div>
-            <Card className="shadow-lg">
-              <CardHeader className="bg-green-500 text-white">
-                <CardTitle className="text-xl flex items-center">
-                  <User className="mr-2" />
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Pacientes em Atendimento */}
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                  <User className="mr-2 w-5 h-5" />
                   Em Atendimento ({calledPatients.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
+              <CardContent>
+                <div className="space-y-3">
                   {calledPatients.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">
+                    <p className="text-center text-gray-500 py-4">
                       Nenhum paciente em atendimento
                     </p>
                   ) : (
                     calledPatients.map((patient) => (
-                      <div key={patient.id} className="p-4 bg-green-50 rounded-lg">
+                      <div key={patient.id} className="p-3 bg-green-50 rounded-lg border border-green-200">
                         <div className="text-lg font-bold text-green-700">
                           {patient.number}
                         </div>
@@ -171,27 +181,27 @@ const Triagem = () => {
             </Card>
 
             {/* Estatísticas */}
-            <Card className="shadow-lg mt-6">
-              <CardHeader className="bg-gray-100">
-                <CardTitle className="text-lg">Estatísticas</CardTitle>
+            <Card className="bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">Estatísticas</CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span>Fila Normal:</span>
+                    <span className="text-sm text-gray-600">Fila Normal:</span>
                     <Badge variant="outline">{state.stats.normalQueue}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fila Prioritária:</span>
+                    <span className="text-sm text-gray-600">Fila Prioritária:</span>
                     <Badge variant="destructive">{state.stats.priorityQueue}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Total Hoje:</span>
+                    <span className="text-sm text-gray-600">Total Hoje:</span>
                     <Badge>{state.stats.totalToday}</Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Atendidos:</span>
-                    <Badge variant="default">{state.stats.completedToday}</Badge>
+                    <span className="text-sm text-gray-600">Atendidos:</span>
+                    <Badge variant="secondary">{state.stats.completedToday}</Badge>
                   </div>
                 </div>
               </CardContent>
