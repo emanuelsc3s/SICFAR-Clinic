@@ -127,12 +127,73 @@ export function QueueProvider({ children }: { children: React.ReactNode }) {
         employeeBadge: 'EMP002',
         timestamp: new Date(Date.now() - 600000),
         status: 'waiting'
+      },
+      {
+        id: '3',
+        number: 'N002',
+        type: 'normal',
+        employeeBadge: 'EMP003',
+        timestamp: new Date(Date.now() - 900000),
+        status: 'waiting'
+      },
+      {
+        id: '4',
+        number: 'P002',
+        type: 'priority',
+        employeeBadge: 'EMP004',
+        timestamp: new Date(Date.now() - 1200000),
+        status: 'waiting'
       }
     ];
 
     samplePatients.forEach(patient => {
       dispatch({ type: 'ADD_PATIENT', payload: patient });
     });
+
+    // Simular algumas chamadas atuais
+    setTimeout(() => {
+      dispatch({ 
+        type: 'CALL_PATIENT', 
+        payload: { 
+          patientId: '2', 
+          location: 'Triagem 1', 
+          attendant: 'Enfermeira Ana' 
+        } 
+      });
+    }, 1000);
+
+    setTimeout(() => {
+      dispatch({ 
+        type: 'CALL_PATIENT', 
+        payload: { 
+          patientId: '1', 
+          location: 'Consultório 3', 
+          attendant: 'Dr. Silva' 
+        } 
+      });
+    }, 2000);
+
+    setTimeout(() => {
+      dispatch({ 
+        type: 'CALL_PATIENT', 
+        payload: { 
+          patientId: '4', 
+          location: 'Triagem 2', 
+          attendant: 'Enfermeira Maria' 
+        } 
+      });
+    }, 3000);
+
+    setTimeout(() => {
+      dispatch({ 
+        type: 'CALL_PATIENT', 
+        payload: { 
+          patientId: '3', 
+          location: 'Consultório 1', 
+          attendant: 'Dra. Santos' 
+        } 
+      });
+    }, 4000);
   }, []);
 
   return (
