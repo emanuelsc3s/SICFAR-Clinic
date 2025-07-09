@@ -11,6 +11,7 @@ import Tablet from "./pages/Tablet";
 import Triagem from "./pages/Triagem";
 import TV from "./pages/TV";
 import Medico from "./pages/Medico";
+import Prontuario from "./pages/Prontuario";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/triagem" element={<Triagem />} />
               <Route path="/tv" element={<TV />} />
               <Route path="/medico" element={<Medico />} />
+              <Route path="/prontuario" element={<Prontuario />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
