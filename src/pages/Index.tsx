@@ -27,6 +27,7 @@ const Index = () => {
       icon: Tablet,
       path: '/tablet',
       color: 'bg-blue-600 hover:bg-blue-700',
+      iconColor: 'text-blue-600',
       features: ['Senhas Normal/Prioritária', 'Identificação por crachá', 'Interface touch-friendly']
     },
     {
@@ -35,6 +36,7 @@ const Index = () => {
       icon: Users,
       path: '/triagem',
       color: 'bg-green-600 hover:bg-green-700',
+      iconColor: 'text-green-600',
       features: ['Lista de pacientes', 'Chamada para triagem', 'Controle de fila']
     },
     {
@@ -43,6 +45,7 @@ const Index = () => {
       icon: Monitor,
       path: '/tv',
       color: 'bg-purple-600 hover:bg-purple-700',
+      iconColor: 'text-purple-600',
       features: ['Chamadas em tempo real', 'Histórico de senhas', 'Interface fullscreen']
     },
     {
@@ -51,6 +54,7 @@ const Index = () => {
       icon: Stethoscope,
       path: '/medico',
       color: 'bg-red-600 hover:bg-red-700',
+      iconColor: 'text-red-600',
       features: ['Fila pós-triagem', 'Chamada por consultório', 'Controle de atendimento']
     },
     {
@@ -59,6 +63,7 @@ const Index = () => {
       icon: FileText,
       path: '/prontuario',
       color: 'bg-indigo-600 hover:bg-indigo-700',
+      iconColor: 'text-indigo-600',
       features: ['Anamnese completa', 'Exame físico', 'Prescrições médicas']
     },
     {
@@ -67,6 +72,7 @@ const Index = () => {
       icon: BarChart3,
       path: '/dashboard',
       color: 'bg-orange-600 hover:bg-orange-700',
+      iconColor: 'text-orange-600',
       features: ['Métricas em tempo real', 'Gráficos interativos', 'Relatórios detalhados']
     }
   ];
@@ -74,7 +80,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center">
             <Activity className="w-8 h-8 text-blue-600 mr-3" />
@@ -159,7 +165,7 @@ const Index = () => {
                 <CardHeader className="pb-4">
                   <div className="flex items-center">
                     <div className="p-3 bg-gray-100 rounded-lg mr-4 group-hover:bg-gray-200 transition-colors">
-                      <Icon className="w-8 h-8 text-gray-700" />
+                      <Icon className={`w-8 h-8 ${module.iconColor}`} />
                     </div>
                     <div>
                       <CardTitle className="text-lg font-semibold text-gray-900">{module.title}</CardTitle>
