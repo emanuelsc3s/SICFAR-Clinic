@@ -1,0 +1,16 @@
+# MIME type configuration for Apache servers
+<IfModule mod_mime.c>
+  AddType text/javascript .js
+  AddType text/javascript .mjs
+  AddType text/css .css
+</IfModule>
+
+# Enable CORS if needed
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|mjs|css)$">
+    Header set Content-Type text/javascript
+  </FilesMatch>
+  <FilesMatch "\.css$">
+    Header set Content-Type text/css
+  </FilesMatch>
+</IfModule>

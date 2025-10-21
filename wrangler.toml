@@ -1,0 +1,35 @@
+# Cloudflare Pages configuration
+name = "sicfar-clinic"
+
+[site]
+bucket = "./dist"
+
+[[headers]]
+for = "/assets/*.js"
+  [headers.values]
+  Content-Type = "text/javascript; charset=utf-8"
+  X-Content-Type-Options = "nosniff"
+
+[[headers]]
+for = "/assets/*.mjs"
+  [headers.values]
+  Content-Type = "text/javascript; charset=utf-8"
+  X-Content-Type-Options = "nosniff"
+
+[[headers]]
+for = "/assets/*.css"
+  [headers.values]
+  Content-Type = "text/css; charset=utf-8"
+  X-Content-Type-Options = "nosniff"
+
+[[headers]]
+for = "/*.js"
+  [headers.values]
+  Content-Type = "text/javascript; charset=utf-8"
+  X-Content-Type-Options = "nosniff"
+
+[[headers]]
+for = "/*.mjs"
+  [headers.values]
+  Content-Type = "text/javascript; charset=utf-8"
+  X-Content-Type-Options = "nosniff"
