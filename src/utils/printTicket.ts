@@ -31,10 +31,8 @@ const generateTicketHTML = (data: TicketData): string => {
     <style>
       @media print {
         @page {
-          /* Tamanho B8 em orientação paisagem (62mm × 88mm) */
-          size: B8 landscape;
-          /* Fallback por dimensões exatas para maior compatibilidade */
-          size: 88mm 62mm;
+          /* Tamanho personalizado: 88mm (largura) x 124mm (altura) */
+          size: 88mm 124mm;
           margin: 0;
         }
         body {
@@ -42,7 +40,7 @@ const generateTicketHTML = (data: TicketData): string => {
           padding: 0;
           /* Garante a área de impressão no iframe/nova janela */
           width: 88mm;
-          height: 62mm;
+          height: 124mm;
         }
       }
       body {
