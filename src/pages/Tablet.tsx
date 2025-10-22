@@ -57,125 +57,121 @@ const Tablet = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle p-6 font-inter animate-fade-in">
-      <div className="max-w-5xl mx-auto">
-        {/* Modern Header */}
-        <div className="text-center mb-16 animate-scale-in">
-          <div className="flex items-center justify-center mb-8">
-            <div className="p-4 bg-gradient-primary rounded-2xl mr-6 shadow-glow animate-float">
-              <TabletIcon className="w-20 h-20 text-white" />
+    <div className="h-screen bg-gradient-subtle p-2 font-inter animate-fade-in overflow-hidden">
+      <div className="max-w-full mx-auto h-full flex flex-col">
+        {/* Compact Header */}
+        <div className="text-center mb-2 animate-scale-in">
+          <div className="flex items-center justify-center mb-1">
+            <div className="p-2 bg-gradient-primary rounded-xl mr-3 shadow-glow">
+              <TabletIcon className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               Sistema de Senhas
             </h1>
           </div>
-          <p className="text-2xl md:text-3xl text-muted-foreground font-light">
-            Geração de Senhas Ambulatoriais
-          </p>
         </div>
 
-        {/* Elegant Badge Input */}
-        <Card className="mb-12 shadow-elegant-lg border-0 bg-surface-elevated backdrop-blur-sm">
-          <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
-            <CardTitle className="text-3xl flex items-center justify-center py-4">
-              <UserCheck className="mr-4 w-8 h-8" />
-              Identificação do Colaborador
+        {/* Compact Badge Input */}
+        <Card className="mb-2 shadow-elegant-lg border-0 bg-surface-elevated backdrop-blur-sm">
+          <CardHeader className="bg-gradient-primary text-white rounded-t-lg p-2">
+            <CardTitle className="text-sm flex items-center justify-center">
+              <UserCheck className="mr-2 w-4 h-4" />
+              Crachá do Colaborador
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-10">
+          <CardContent className="p-2">
             <Input
               type="text"
-              placeholder="Digite o número do crachá"
+              placeholder="Número do crachá"
               value={employeeBadge}
               onChange={(e) => setEmployeeBadge(e.target.value)}
-              className="text-3xl p-8 border-2 border-muted rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 shadow-elegant-sm"
+              className="text-base p-2 border-2 border-muted rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
               onKeyPress={(e) => e.key === 'Enter' && generatePassword('normal')}
             />
           </CardContent>
         </Card>
 
-        {/* Modern Password Generation Cards */}
-        <div className="grid md:grid-cols-2 gap-10 mb-12">
+        {/* Compact Password Generation Cards */}
+        <div className="grid grid-cols-2 gap-2 mb-2 flex-1">
           {/* Normal Password Card */}
-          <Card 
-            className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-500 cursor-pointer group animate-slide-up hover:scale-105" 
+          <Card
+            className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-300 cursor-pointer group flex flex-col"
             onClick={() => generatePassword('normal')}
           >
-            <CardContent className="p-12 text-center">
-              <div className="mb-8">
-                <div className="p-6 bg-gradient-to-br from-success/10 to-success/5 rounded-3xl w-fit mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-elegant-md">
-                  <UserCheck className="w-28 h-28 text-success mx-auto" />
+            <CardContent className="p-3 text-center flex flex-col justify-between h-full">
+              <div className="mb-2">
+                <div className="p-2 bg-gradient-to-br from-success/10 to-success/5 rounded-xl w-fit mx-auto mb-2">
+                  <UserCheck className="w-10 h-10 text-success mx-auto" />
                 </div>
-                <h2 className="text-5xl font-bold text-foreground mb-4">NORMAL</h2>
-                <Badge variant="outline" className="text-xl px-6 py-3 border-2 border-success/30 text-success bg-success/5">
-                  Fila: {state.stats.normalQueue} pacientes
+                <h2 className="text-xl font-bold text-foreground mb-1">NORMAL</h2>
+                <Badge variant="outline" className="text-xs px-2 py-1 border border-success/30 text-success bg-success/5">
+                  Fila: {state.stats.normalQueue}
                 </Badge>
               </div>
-              <Button 
-                size="lg" 
-                className="w-full text-3xl py-8 bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-xl shadow-elegant-lg hover:shadow-glow transition-all duration-300"
+              <Button
+                size="sm"
+                className="w-full text-sm py-3 bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-lg shadow-elegant-lg transition-all duration-300"
                 onClick={(e) => {
                   e.stopPropagation();
                   generatePassword('normal');
                 }}
               >
-                Gerar Senha Normal
+                Gerar Senha
               </Button>
             </CardContent>
           </Card>
 
           {/* Priority Password Card */}
-          <Card 
-            className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-500 cursor-pointer group animate-slide-up hover:scale-105"
-            style={{ animationDelay: '100ms' }}
+          <Card
+            className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-300 cursor-pointer group flex flex-col"
             onClick={() => generatePassword('priority')}
           >
-            <CardContent className="p-12 text-center">
-              <div className="mb-8">
-                <div className="p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-3xl w-fit mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-elegant-md">
-                  <AlertTriangle className="w-28 h-28 text-destructive mx-auto" />
+            <CardContent className="p-3 text-center flex flex-col justify-between h-full">
+              <div className="mb-2">
+                <div className="p-2 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-xl w-fit mx-auto mb-2">
+                  <AlertTriangle className="w-10 h-10 text-destructive mx-auto" />
                 </div>
-                <h2 className="text-5xl font-bold text-foreground mb-4">PRIORITÁRIA</h2>
-                <Badge variant="outline" className="text-xl px-6 py-3 border-2 border-destructive/30 text-destructive bg-destructive/5">
-                  Fila: {state.stats.priorityQueue} pacientes
+                <h2 className="text-xl font-bold text-foreground mb-1">PRIORITÁRIA</h2>
+                <Badge variant="outline" className="text-xs px-2 py-1 border border-destructive/30 text-destructive bg-destructive/5">
+                  Fila: {state.stats.priorityQueue}
                 </Badge>
               </div>
-              <Button 
-                size="lg" 
-                className="w-full text-3xl py-8 bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-xl shadow-elegant-lg hover:shadow-glow transition-all duration-300"
+              <Button
+                size="sm"
+                className="w-full text-sm py-3 bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-lg shadow-elegant-lg transition-all duration-300"
                 onClick={(e) => {
                   e.stopPropagation();
                   generatePassword('priority');
                 }}
               >
-                Gerar Senha Prioritária
+                Gerar Senha
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Elegant Statistics */}
-        <Card className="shadow-elegant-xl border-0 bg-surface-elevated animate-fade-in">
-          <CardHeader className="bg-gradient-subtle rounded-t-lg border-b border-border/50">
-            <CardTitle className="text-3xl text-center py-4 text-foreground">Estatísticas do Dia</CardTitle>
+        {/* Compact Statistics */}
+        <Card className="shadow-elegant-xl border-0 bg-surface-elevated">
+          <CardHeader className="bg-gradient-subtle rounded-t-lg border-b border-border/50 p-2">
+            <CardTitle className="text-sm text-center text-foreground">Estatísticas do Dia</CardTitle>
           </CardHeader>
-          <CardContent className="p-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl shadow-elegant-sm hover:shadow-elegant-md transition-all duration-300">
-                <div className="text-5xl font-bold text-primary mb-2">{state.stats.totalToday}</div>
-                <div className="text-lg text-muted-foreground font-medium">Total Hoje</div>
+          <CardContent className="p-2">
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="p-2 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg">
+                <div className="text-xl font-bold text-primary">{state.stats.totalToday}</div>
+                <div className="text-[10px] text-muted-foreground font-medium">Total</div>
               </div>
-              <div className="p-6 bg-gradient-to-br from-success/5 to-success/10 rounded-2xl shadow-elegant-sm hover:shadow-elegant-md transition-all duration-300">
-                <div className="text-5xl font-bold text-success mb-2">{state.stats.normalQueue}</div>
-                <div className="text-lg text-muted-foreground font-medium">Fila Normal</div>
+              <div className="p-2 bg-gradient-to-br from-success/5 to-success/10 rounded-lg">
+                <div className="text-xl font-bold text-success">{state.stats.normalQueue}</div>
+                <div className="text-[10px] text-muted-foreground font-medium">Normal</div>
               </div>
-              <div className="p-6 bg-gradient-to-br from-destructive/5 to-destructive/10 rounded-2xl shadow-elegant-sm hover:shadow-elegant-md transition-all duration-300">
-                <div className="text-5xl font-bold text-destructive mb-2">{state.stats.priorityQueue}</div>
-                <div className="text-lg text-muted-foreground font-medium">Fila Prioritária</div>
+              <div className="p-2 bg-gradient-to-br from-destructive/5 to-destructive/10 rounded-lg">
+                <div className="text-xl font-bold text-destructive">{state.stats.priorityQueue}</div>
+                <div className="text-[10px] text-muted-foreground font-medium">Prior.</div>
               </div>
-              <div className="p-6 bg-gradient-to-br from-warning/5 to-warning/10 rounded-2xl shadow-elegant-sm hover:shadow-elegant-md transition-all duration-300">
-                <div className="text-5xl font-bold text-warning mb-2">{state.stats.completedToday}</div>
-                <div className="text-lg text-muted-foreground font-medium">Atendidos</div>
+              <div className="p-2 bg-gradient-to-br from-warning/5 to-warning/10 rounded-lg">
+                <div className="text-xl font-bold text-warning">{state.stats.completedToday}</div>
+                <div className="text-[10px] text-muted-foreground font-medium">Atend.</div>
               </div>
             </div>
           </CardContent>

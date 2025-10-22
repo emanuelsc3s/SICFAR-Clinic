@@ -25,8 +25,8 @@ const Navigation = () => {
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
   ];
 
-  if (location.pathname === '/tv') {
-    return null; // Não mostrar navegação na TV
+  if (location.pathname === '/tv' || location.pathname === '/tablet') {
+    return null; // Não mostrar navegação na TV e no Tablet
   }
 
   return (
