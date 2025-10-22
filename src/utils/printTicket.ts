@@ -52,6 +52,13 @@ const generateTicketHTML = (data: TicketData): string => {
         padding-top: 8px; /* respiro do topo para evitar corte */
         box-sizing: border-box;
       }
+      .ticket-footer {
+        margin-top: auto;
+        font-size: 10px;
+        opacity: 0.75;
+        padding-bottom: 6px;
+      }
+
     </style>
 </head>
 <body>
@@ -62,6 +69,7 @@ const generateTicketHTML = (data: TicketData): string => {
     <p style="font-family: Arial Black; font-size: 10px"> Matrícula: ${data.employeeBadge}</p>
     <p style="font-family: Arial Black; font-size: 10px"> Colaborador: ${employeeName}</p>
     <p style="font-family: Arial Black; font-size: 8px"> ${dateTimeString}</p>
+    <p class="ticket-footer">SICFAR Clinic - FARMACE</p>
 </div>
 </body>
 </html>`;
@@ -73,6 +81,7 @@ const generateTicketHTML = (data: TicketData): string => {
  * True silent printing requires a backend service or browser extension.
  */
 export const printTicket = (data: TicketData): void => {
+  console.info('[SICFAR] Impressão HTML (fallback)');
   const html = generateTicketHTML(data);
 
   // Create a hidden iframe for printing

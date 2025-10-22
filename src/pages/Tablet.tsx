@@ -9,7 +9,6 @@ import { Patient } from '@/types/queue';
 import { UserCheck, AlertTriangle, IdCard, Search, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { printTicket } from '@/utils/printTicket';
-import { printThermalTicket } from '@/utils/thermalPrinter';
 
 const Tablet = () => {
   const [employeeBadge, setEmployeeBadge] = useState('');
@@ -64,21 +63,12 @@ const Tablet = () => {
       description: `Senha ${number} gerada com sucesso`,
     });
 
-    // Impressão térmica via RawBT (Android). Fallback para impressão via janela
-    try {
-      await printThermalTicket({
-        number,
-        employeeBadge: employeeBadge.trim(),
-        timestamp: new Date(),
-      });
-    } catch (err) {
-      // Ambiente não-Android ou RawBT ausente → usa impressão HTML padrão
-      printTicket({
-        number,
-        employeeBadge: employeeBadge.trim(),
-        timestamp: new Date(),
-      });
-    }
+    // Impressão via HTML/CSS
+    printTicket({
+      number,
+      employeeBadge: employeeBadge.trim(),
+      timestamp: new Date(),
+    });
 
     setEmployeeBadge('');
     setEmployeeName('');
