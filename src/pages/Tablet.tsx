@@ -8,7 +8,7 @@ import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
 import { UserCheck, AlertTriangle, IdCard, Search, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { printTicket } from '@/utils/printTicket';
+import { printThermalTicket } from '@/utils/thermalPrinter';
 
 const Tablet = () => {
   const [employeeBadge, setEmployeeBadge] = useState('');
@@ -63,12 +63,21 @@ const Tablet = () => {
       description: `Senha ${number} gerada com sucesso`,
     });
 
-    // Impressão via HTML/CSS
-    printTicket({
-      number,
-      employeeBadge: employeeBadge.trim(),
-      timestamp: new Date(),
-    });
+    // Impressão térmica via RawBT (Android) com ESC/POS
+    try {
+      await printThermalTicket({
+        number,
+        employeeBadge: employeeBadge.trim(),
+        timestamp: new Date(),
+      });
+    } catch (err) {
+      console.error('Erro ao imprimir senha:', err);
+      toast({
+        title: "Erro na Impressão",
+        description: "Falha ao imprimir a senha. Verifique a impressora térmica.",
+        variant: "destructive",
+      });
+    }
 
     setEmployeeBadge('');
     setEmployeeName('');

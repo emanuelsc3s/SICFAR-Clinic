@@ -23,7 +23,7 @@ SICFAR-Clinic é um sistema de gerenciamento de senhas para ambientes ambulatori
 - **Estado**: Context API (QueueContext) + TanStack React Query
 - **Backend**: Supabase (BaaS)
 - **Formulários**: React Hook Form + Zod
-- **Impressão**: Tickets via iframe/window.print (formato B8)
+- **Impressão**: Tickets via ESC/POS (RawBT no Android)
 
 ## Comandos Principais
 
@@ -90,11 +90,12 @@ const { state, dispatch } = useQueue();
 
 ### Impressão de Senhas
 
-A impressão é feita via `printTicket()` em `src/utils/printTicket.ts`:
-- Cria iframe oculto com HTML da senha
-- Formato: B8 landscape (88mm × 62mm)
+A impressão é feita via `printThermalTicket()` em `src/utils/thermalPrinter.tsx`:
+- Gera comandos **ESC/POS** (binários) para impressoras térmicas
+- Envia via **Intent do Android** para o app **RawBT**
+- Suporta impressoras térmicas como Mini PDV M10 Elgin
 - Inclui número da senha, matrícula do colaborador, data/hora
-- Impressão automática para senhas normais (ver `src/pages/Tablet.tsx:48-54`)
+- Requer app RawBT instalado no Android (https://rawbt.ru/start.html)
 
 ## Variáveis de Ambiente
 
