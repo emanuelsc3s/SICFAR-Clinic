@@ -30,17 +30,10 @@ const generateTicketHTML = (data: TicketData): string => {
     <title>Senha - ${data.number}</title>
     <style>
       @media print {
-        @page {
-          /* Tamanho personalizado: 88mm (largura) x 124mm (altura) */
-          size: 88mm 124mm;
-          margin: 0;
-        }
+        /* Usar pixels para controlar o tamanho, evitando conflitos de @page size */
         html, body {
           margin: 0;
           padding: 0;
-          /* Garante a área de impressão no iframe/nova janela */
-          width: 88mm;
-          height: 124mm;
         }
       }
       html, body {
@@ -48,24 +41,26 @@ const generateTicketHTML = (data: TicketData): string => {
         padding: 0;
       }
       .ticket {
-        width: 88mm;
-        height: 124mm;
+        width: 200px;   /* equivalente aproximado a 88mm, mantendo o valor original em px */
+        height: 600px;  /* dobro dos 300px originais */
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center; /* centraliza verticalmente o conteúdo */
+        align-items: center;      /* centraliza horizontalmente */
+        justify-content: flex-start; /* alinha ao topo (sem centralização vertical) */
         line-height: 1.1;
         text-align: center;
+        padding-top: 8px; /* respiro do topo para evitar corte */
+        box-sizing: border-box;
       }
     </style>
 </head>
 <body>
 <div class="ticket">
     <img src="https://farmace.com.br/images/farmace50.png" style="align: center; width:50px" />
-    <p style="font-family: Arial Black; font-size: 10px"> Atendimento Ambulatorial</p>
-    <p style="font-family: Arial Black; font-size: 40px;"> ${data.number}</p>
-    <p style="font-family: Arial Black; font-size: 10px"> Mat.: ${data.employeeBadge}</p>
-    <p style="font-family: Arial Black; font-size: 10px"> Nome: ${employeeName}</p>
+    <p style="font-family: Arial Black; font-size: 20px; font-weight: bold"> Atendimento Ambulatorial</p>
+    <p style="font-family: Arial Black; font-size: 40px; font-weight: bold"> ${data.number}</p>
+    <p style="font-family: Arial Black; font-size: 10px"> Matrícula: ${data.employeeBadge}</p>
+    <p style="font-family: Arial Black; font-size: 10px"> Colaborador: ${employeeName}</p>
     <p style="font-family: Arial Black; font-size: 8px"> ${dateTimeString}</p>
 </div>
 </body>
