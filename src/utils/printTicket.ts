@@ -35,7 +35,7 @@ const generateTicketHTML = (data: TicketData): string => {
           size: 88mm 124mm;
           margin: 0;
         }
-        body {
+        html, body {
           margin: 0;
           padding: 0;
           /* Garante a área de impressão no iframe/nova janela */
@@ -43,14 +43,24 @@ const generateTicketHTML = (data: TicketData): string => {
           height: 124mm;
         }
       }
-      body {
+      html, body {
         margin: 0;
         padding: 0;
       }
+      .ticket {
+        width: 88mm;
+        height: 124mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* centraliza verticalmente o conteúdo */
+        line-height: 1.1;
+        text-align: center;
+      }
     </style>
 </head>
-<body style="height: 300px">
-<div style="height: 300px; width: 200px; line-height: 0.3em; text-align: center;">
+<body>
+<div class="ticket">
     <img src="https://farmace.com.br/images/farmace50.png" style="align: center; width:50px" />
     <p style="font-family: Arial Black; font-size: 10px"> Atendimento Ambulatorial</p>
     <p style="font-family: Arial Black; font-size: 40px;"> ${data.number}</p>
