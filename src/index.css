@@ -21,10 +21,12 @@
     --popover-foreground: 220 13% 18%;
 
     /* Primary Brand Colors - Modern Blue */
-    --primary: 214 84% 50%;
+    --primary: 212 81% 41%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 214 84% 60%;
-    --primary-muted: 214 50% 96%;
+    --primary-hover: 212 81% 35%;
+    --primary-light: 212 81% 41% / 0.1;
+    --primary-glow: 212 81% 51%;
+    --primary-muted: 212 50% 96%;
 
     /* Secondary Colors - Elegant Gray */
     --secondary: 220 14% 96%;

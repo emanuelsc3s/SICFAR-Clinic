@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Emissão de Senhas de Atendimento">
+    <title>Sistema de Senhas - Atendimento</title>
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Card Principal -->
+        <div class="card">
+            <!-- Cabeçalho -->
+            <div class="card-header">
+                <div class="header-icon">
+                    <i data-lucide="ticket"></i>
+                </div>
+                <h1 class="card-title">Ambulatório Médico</h1>
+                <p class="card-description">Emissão de senhas de atendimento</p>
+            </div>
+
+            <!-- Formulário -->
+            <form id="senhaForm" class="form">
+                <!-- Campo Número do Crachá -->
+                <div class="form-group">
+                    <label for="cracha" class="form-label">
+                        <i data-lucide="id-card"></i>
+                        Número do Crachá
+                    </label>
+                    <div class="input-with-button">
+                        <input
+                            type="number"
+                            id="cracha"
+                            name="cracha"
+                            class="form-input"
+                            placeholder="Digite o número do crachá"
+                            aria-label="Número do crachá"
+                            required
+                        >
+                        <button
+                            type="button"
+                            id="btnLocalizarCracha"
+                            class="btn-search"
+                            aria-label="Localizar crachá"
+                            title="Localizar crachá"
+                        >
+                            <i data-lucide="search"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="crachaError"></span>
+                </div>
+
+                <!-- Campo Nome -->
+                <div class="form-group">
+                    <label for="nome" class="form-label">
+                        <i data-lucide="user"></i>
+                        Nome
+                    </label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        class="form-input"
+                        placeholder="Digite seu nome completo"
+                        aria-label="Nome completo"
+                        required
+                    >
+                    <span class="error-message" id="nomeError"></span>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="button-group">
+                    <button
+                        type="button"
+                        id="btnNormal"
+                        class="btn btn-normal"
+                        aria-label="Emitir senha normal"
+                    >
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Normal</span>
+                    </button>
+                    <button
+                        type="button"
+                        id="btnPrioritario"
+                        class="btn btn-priority"
+                        aria-label="Emitir senha prioritária"
+                    >
+                        <i data-lucide="star"></i>
+                        <span>Prioritário</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Área de Exibição da Senha Gerada -->
+            <div id="senhaGerada" class="senha-display hidden" role="alert" aria-live="polite">
+                <div class="senha-icon">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div class="senha-content">
+                    <p class="senha-label">Senha Gerada</p>
+                    <p class="senha-numero" id="senhaNumero"></p>
+                    <p class="senha-tipo" id="senhaTipo"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Histórico (opcional) -->
+        <div class="card history-card">
+            <div class="history-header">
+                <h2 class="history-title">
+                    <i data-lucide="clock"></i>
+                    Histórico de Senhas
+                </h2>
+                <button id="btnLimparHistorico" class="btn-clear" aria-label="Limpar histórico">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+            <div id="historicoLista" class="history-list">
+                <p class="empty-state">Nenhuma senha emitida ainda</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Externo -->
+    <script src="script.js"></script>
+</body>
+</html>
