@@ -6,26 +6,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
-import { UserCheck, AlertTriangle, Tablet as TabletIcon } from 'lucide-react';
+import { UserCheck, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { printTicket } from '@/utils/printTicket';
+import { printThermalTicket } from '@/utils/thermalPrinter';
 
 const Tablet = () => {
   const [employeeBadge, setEmployeeBadge] = useState('');
   const { state, dispatch } = useQueue();
 
-  const generatePassword = (type: 'normal' | 'priority') => {
+  const generatePassword = async (type: 'normal' | 'priority') => {
     if (!employeeBadge.trim()) {
       toast({
         title: "Erro",
         description: "Por favor, insira o número do crachá do colaborador",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     const prefix = type === 'normal' ? 'N' : 'P';
-    const count = state.patients.filter(p => p.type === type).length + 1;
+    const count = state.patients.filter((p) => p.type === type).length + 1;
     const number = `${prefix}${count.toString().padStart(3, '0')}`;
 
     const newPatient: Patient = {
@@ -34,7 +35,7 @@ const Tablet = () => {
       type,
       employeeBadge: employeeBadge.trim(),
       timestamp: new Date(),
-      status: 'waiting'
+      status: 'waiting',
     };
 
     dispatch({ type: 'ADD_PATIENT', payload: newPatient });
@@ -44,12 +45,19 @@ const Tablet = () => {
       description: `Senha ${number} gerada com sucesso`,
     });
 
-    // Print ticket automatically for normal passwords
-    if (type === 'normal') {
-      printTicket({
-        number: number,
+    // Impressão térmica via RawBT (Android). Fallback para impressão via janela
+    try {
+      await printThermalTicket({
+        number,
         employeeBadge: employeeBadge.trim(),
-        timestamp: new Date()
+        timestamp: new Date(),
+      });
+    } catch (err) {
+      // Ambiente não-Android ou RawBT ausente → usa impressão HTML padrão
+      printTicket({
+        number,
+        employeeBadge: employeeBadge.trim(),
+        timestamp: new Date(),
       });
     }
 
@@ -62,11 +70,13 @@ const Tablet = () => {
         {/* Ultra Compact Header - Optimized for 800x460 */}
         <div className="text-center mb-1.5 animate-scale-in">
           <div className="flex items-center justify-center">
-            <div className="p-1.5 bg-gradient-primary rounded-lg mr-2 shadow-glow">
-              <TabletIcon className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/farmace.png"
+              alt="Farmace"
+              className="h-8 mr-2"
+            />
             <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              Sistema de Senhas
+              Ambulatório - Senha de Atendimento
             </h1>
           </div>
         </div>
