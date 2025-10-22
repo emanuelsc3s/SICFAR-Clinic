@@ -94,7 +94,7 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(lf(2));
 
   // Espaçamento extra no final para dobrar a altura total
-  chunks.push(lf(4));
+  chunks.push(lf(20));
 
   // Corte
   chunks.push(cut());
