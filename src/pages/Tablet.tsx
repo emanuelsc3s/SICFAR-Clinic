@@ -8,6 +8,7 @@ import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
 import { UserCheck, AlertTriangle, Tablet as TabletIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { printTicket } from '@/utils/printTicket';
 
 const Tablet = () => {
   const [employeeBadge, setEmployeeBadge] = useState('');
@@ -37,11 +38,20 @@ const Tablet = () => {
     };
 
     dispatch({ type: 'ADD_PATIENT', payload: newPatient });
-    
+
     toast({
       title: "Senha Gerada!",
       description: `Senha ${number} gerada com sucesso`,
     });
+
+    // Print ticket automatically for normal passwords
+    if (type === 'normal') {
+      printTicket({
+        number: number,
+        employeeBadge: employeeBadge.trim(),
+        timestamp: new Date()
+      });
+    }
 
     setEmployeeBadge('');
   };
