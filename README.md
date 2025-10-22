@@ -1,73 +1,85 @@
-# Welcome to your Lovable project
+# SICFAR-Clinic
 
-## Project info
+Sistema de Senhas Ambulatoriais - Gestão de Filas Médicas
 
-**URL**: https://lovable.dev/projects/ba107236-525b-45fd-9018-ebaaa5b02a06
+## Sobre o Projeto
 
-## How can I edit this code?
+SICFAR-Clinic é um sistema de gerenciamento de senhas para ambientes ambulatoriais, desenvolvido para otimizar o fluxo de atendimento médico e melhorar a experiência de pacientes e profissionais de saúde.
 
-There are several ways of editing your application.
+## Tecnologias Utilizadas
 
-**Use Lovable**
+Este projeto foi desenvolvido com as seguintes tecnologias:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ba107236-525b-45fd-9018-ebaaa5b02a06) and start prompting.
+- **Vite** - Build tool e dev server
+- **React 18.3.1** - Framework UI
+- **TypeScript** - Tipagem estática
+- **React Router DOM** - Roteamento
+- **Supabase** - Backend as a Service
+- **TanStack React Query** - Gerenciamento de estado
+- **shadcn/ui** - Componentes UI baseados em Radix UI
+- **Tailwind CSS** - Estilização
+- **React Hook Form + Zod** - Formulários e validação
+- **Lucide React** - Ícones
+- **Recharts** - Gráficos
+- **Sonner** - Notificações toast
 
-Changes made via Lovable will be committed automatically to this repo.
+## Pré-requisitos
 
-**Use your preferred IDE**
+- Node.js (recomendado: usar [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- npm ou yarn
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Instalação
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clone o repositório
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navegue até o diretório do projeto
+cd SICFAR-Clinic
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Instale as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Configure as variáveis de ambiente
+# Crie um arquivo .env.local baseado no .env.example
+cp .env.example .env.local
+
+# Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Scripts Disponíveis
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `npm run dev` - Inicia o servidor de desenvolvimento na porta 8080
+- `npm run build` - Compila o projeto para produção
+- `npm run build:dev` - Compila o projeto em modo desenvolvimento
+- `npm run lint` - Executa o linter
+- `npm run preview` - Visualiza o build de produção
 
-**Use GitHub Codespaces**
+## Estrutura do Projeto
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+SICFAR-Clinic/
+├── src/
+│   ├── components/     # Componentes React
+│   ├── pages/          # Páginas da aplicação
+│   ├── hooks/          # Custom hooks
+│   ├── lib/            # Utilitários e configurações
+│   ├── utils/          # Funções utilitárias
+│   └── main.tsx        # Ponto de entrada
+├── public/             # Arquivos estáticos
+└── index.html          # HTML template
+```
 
-## What technologies are used for this project?
+## Configuração do Ambiente
 
-This project is built with:
+O projeto requer variáveis de ambiente para conectar ao Supabase. Configure-as no arquivo `.env.local`:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## How can I deploy this project?
+## Licença
 
-Simply open [Lovable](https://lovable.dev/projects/ba107236-525b-45fd-9018-ebaaa5b02a06) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Este projeto é privado e proprietário.

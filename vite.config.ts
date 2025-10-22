@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -10,24 +9,30 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
+    react({
+      babel: {
+        plugins: mode === 'development' ? [
+          ['babel-plugin-transform-react-jsx-location', {
+            attributeName: 'data-source'
+          }]
+        ] : []
+      }
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  envPrefix: 'VITE_',
+  css: {
+    devSourcemap: true,
+  },
+  esbuild: {
+    sourcemap: mode === 'development',
+    target: mode === 'development' ? 'es2022' : 'es2020',
+  },
   build: {
-    // Ensure proper module format
-    rollupOptions: {
-      output: {
-        // Ensure .js extension for all chunks
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
-      }
-    }
-  }
+    sourcemap: mode === 'development',
+  },
 }));
