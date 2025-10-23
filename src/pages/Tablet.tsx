@@ -41,7 +41,6 @@ const Tablet = () => {
 
   // Estado para controle do prompt de fullscreen
   const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
-  const [fullscreenActivated, setFullscreenActivated] = useState(false);
 
   // Refs para controle de scroll quando teclado abre
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +82,7 @@ const Tablet = () => {
     }, 200);
   };
 
-  const ensureFullscreen = useCallback(async (silent = false) => {
+  const ensureFullscreen = useCallback(async (showPromptOnFail = false) => {
     if (!isAndroid()) return;
     try {
       const el = document.documentElement as HTMLElement;
@@ -91,7 +90,6 @@ const Tablet = () => {
       if (!already) {
         await requestFullscreen(el);
         tryHideAddressBar();
-        setFullscreenActivated(true);
         setShowFullscreenPrompt(false);
         console.log('[SICFAR] Fullscreen ativado com sucesso');
       } else {
@@ -101,12 +99,13 @@ const Tablet = () => {
       // Alguns navegadores (ex.: Opera Mini) podem não suportar a Fullscreen API
       console.warn('[SICFAR] Fullscreen não suportado ou bloqueado:', err);
       tryHideAddressBar();
-      // Se falhar e não for modo silencioso, mostra o prompt para o usuário tentar novamente
-      if (!fullscreenActivated && !silent) {
+      // Se falhar e showPromptOnFail=true, mostra o prompt para o usuário tentar novamente
+      if (showPromptOnFail) {
+        console.log('[SICFAR] Exibindo prompt de fullscreen após falha');
         setShowFullscreenPrompt(true);
       }
     }
-  }, [fullscreenActivated]);
+  }, []);
 
   const handleUserGestureForFullscreen = useCallback(() => {
     if (!isAndroid()) return;
@@ -126,19 +125,34 @@ const Tablet = () => {
     if (!isAndroid()) return;
 
     const key = 'SICFAR_FS_RESTORE';
-    const promptKey = 'SICFAR_FS_PROMPT_SHOWN';
 
     const onRestore = () => {
       if (document.visibilityState === 'visible') {
-        // Tentamos sempre que voltar para a aba; a flag melhora o sinal do retorno do RawBT
-        const should = (() => {
+        // Verifica se voltou do RawBT (flag setada antes de imprimir)
+        const shouldRestore = (() => {
           try { return sessionStorage.getItem(key); } catch (e) { return null; }
         })();
-        if (should === '1' || !getFullscreenElement()) {
-          setTimeout(() => { void ensureFullscreen(); }, 120);
-          setTimeout(() => { void ensureFullscreen(); }, 500);
-          setTimeout(() => { void ensureFullscreen(); }, 1200);
+
+        const alreadyInFullscreen = !!getFullscreenElement();
+
+        if (shouldRestore === '1') {
+          console.log('[SICFAR] Retornou do RawBT, verificando fullscreen...');
           try { sessionStorage.removeItem(key); } catch (e) { void e; }
+
+          if (!alreadyInFullscreen) {
+            // Não está em fullscreen após retornar do RawBT
+            // Exibe o prompt para o usuário reativar
+            console.log('[SICFAR] Fullscreen perdido após RawBT, exibindo prompt');
+            setShowFullscreenPrompt(true);
+          } else {
+            console.log('[SICFAR] Fullscreen mantido após RawBT');
+          }
+        } else if (!alreadyInFullscreen) {
+          // Voltou ao foco mas não está em fullscreen (sem ser do RawBT)
+          // Tenta reativar silenciosamente
+          console.log('[SICFAR] Página voltou ao foco sem fullscreen, tentando reativar...');
+          setTimeout(() => { void ensureFullscreen(true); }, 120);
+          setTimeout(() => { void ensureFullscreen(true); }, 500);
         }
       }
     };
@@ -153,29 +167,20 @@ const Tablet = () => {
 
       if (alreadyInFullscreen) {
         console.log('[SICFAR] Já está em fullscreen');
-        setFullscreenActivated(true);
         setShowFullscreenPrompt(false);
         return;
       }
 
       // Primeira tentativa automática (pode falhar por restrição de segurança)
+      console.log('[SICFAR] Tentando ativar fullscreen automaticamente...');
       try {
-        await ensureFullscreen();
+        await ensureFullscreen(false);
         console.log('[SICFAR] Fullscreen ativado automaticamente');
       } catch (err) {
         console.warn('[SICFAR] Tentativa automática de fullscreen falhou:', err);
-
-        // Verifica se já mostrou o prompt nesta sessão
-        const promptShown = (() => {
-          try { return sessionStorage.getItem(promptKey); } catch (e) { return null; }
-        })();
-
-        // Se nunca mostrou o prompt, exibe agora
-        if (!promptShown) {
-          console.log('[SICFAR] Exibindo prompt de fullscreen');
-          setShowFullscreenPrompt(true);
-          try { sessionStorage.setItem(promptKey, '1'); } catch (e) { void e; }
-        }
+        // Exibe o prompt para o usuário ativar manualmente
+        console.log('[SICFAR] Exibindo prompt de fullscreen inicial');
+        setShowFullscreenPrompt(true);
       }
     };
 
@@ -338,14 +343,10 @@ const Tablet = () => {
       // Impressão térmica via RawBT (Android) com ESC/POS
       try {
         // Marca que devemos restaurar fullscreen ao retornar do RawBT
+        // O listener de visibilitychange detectará o retorno e exibirá o prompt se necessário
         try { sessionStorage.setItem('SICFAR_FS_RESTORE', '1'); } catch (e) { void e; }
+        console.log('[SICFAR] Iniciando impressão via RawBT...');
         await printThermalTicket(ticket);
-
-        // Reativa fullscreen imediatamente após impressão (modo silencioso - sem prompt)
-        console.log('[SICFAR] Reativando fullscreen após impressão');
-        setTimeout(() => {
-          void ensureFullscreen(true); // true = modo silencioso
-        }, 100);
       } catch (err) {
         console.error('Erro ao imprimir senha:', err);
       }
@@ -803,15 +804,9 @@ const Tablet = () => {
             {/* Botão Fechar */}
             <div className="p-2 bg-[#F5F1E8] border-t border-black/10">
               <Button
-                onClick={() => {
+                onClick={async () => {
                   setShowTicketPreview(false);
                   setTicketData(null);
-
-                  // Reativa fullscreen após fechar o preview (modo silencioso - sem prompt)
-                  console.log('[SICFAR] Reativando fullscreen após fechar preview');
-                  setTimeout(() => {
-                    void ensureFullscreen(true); // true = modo silencioso
-                  }, 100);
 
                   // Reset do fluxo após fechar o preview
                   setEmployeeBadge('');
@@ -820,6 +815,20 @@ const Tablet = () => {
                   setBadgeValid(null);
                   setPersonType(null);
                   setStep(1);
+
+                  // Tenta reativar fullscreen após fechar o preview
+                  // Se falhar, exibe o prompt para o usuário
+                  console.log('[SICFAR] Verificando fullscreen após fechar preview');
+                  setTimeout(async () => {
+                    if (!getFullscreenElement()) {
+                      try {
+                        await ensureFullscreen(false);
+                      } catch (err) {
+                        console.log('[SICFAR] Fullscreen bloqueado, exibindo prompt');
+                        setShowFullscreenPrompt(true);
+                      }
+                    }
+                  }, 100);
                 }}
                 className="w-full h-8 text-xs"
                 size="sm"
