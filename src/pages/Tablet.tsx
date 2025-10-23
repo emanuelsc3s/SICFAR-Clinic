@@ -328,37 +328,63 @@ const Tablet = () => {
     const performScroll = () => {
       if (!element) return;
 
-      // Método 1: scrollIntoView sem animação (mais confiável no Android)
-      element.scrollIntoView({
-        behavior: 'auto', // 'auto' em vez de 'smooth' para scroll instantâneo
-        block: 'start',   // 'start' em vez de 'center' para garantir que fique no topo
-        inline: 'nearest'
-      });
+      try {
+        // Método 1: scrollIntoView sem animação (mais confiável no Android)
+        // No Android 7, usar 'start' garante que o campo fique visível acima do teclado
+        element.scrollIntoView({
+          behavior: 'auto', // 'auto' em vez de 'smooth' para scroll instantâneo
+          block: 'start',   // 'start' posiciona o elemento no topo da viewport
+          inline: 'nearest'
+        });
+      } catch (e) {
+        console.debug('[SICFAR] scrollIntoView falhou:', e);
+      }
 
-      // Método 2: scroll manual usando getBoundingClientRect (fallback)
-      const rect = element.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const targetY = rect.top + scrollTop - 100; // 100px de margem do topo
+      try {
+        // Método 2: scroll manual usando getBoundingClientRect (fallback para Android 7)
+        // Este método é mais compatível com navegadores antigos
+        const rect = element.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-      window.scrollTo({
-        top: targetY,
-        behavior: 'auto'
-      });
+        // Calcula a posição ideal: elemento no topo com margem de 20px
+        // Margem reduzida de 100px para 20px para maximizar espaço visível
+        const targetY = rect.top + scrollTop - 20;
+
+        window.scrollTo({
+          top: Math.max(0, targetY), // Garante que não role para valores negativos
+          behavior: 'auto'
+        });
+      } catch (e) {
+        console.debug('[SICFAR] window.scrollTo falhou:', e);
+      }
+
+      try {
+        // Método 3: Fallback adicional para Android 7 usando scrollTop direto
+        // Alguns navegadores antigos não suportam window.scrollTo com objeto
+        const rect = element.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetY = Math.max(0, rect.top + scrollTop - 20);
+
+        document.documentElement.scrollTop = targetY;
+        document.body.scrollTop = targetY; // Para navegadores muito antigos
+      } catch (e) {
+        console.debug('[SICFAR] scrollTop direto falhou:', e);
+      }
     };
 
-    // Tentativa 1: Imediata
+    // Tentativa 1: Imediata (antes do teclado começar a abrir)
     performScroll();
 
-    // Tentativa 2: Após 100ms
+    // Tentativa 2: Após 100ms (teclado começando a abrir)
     setTimeout(performScroll, 100);
 
-    // Tentativa 3: Após 300ms
+    // Tentativa 3: Após 300ms (teclado parcialmente aberto)
     setTimeout(performScroll, 300);
 
-    // Tentativa 4: Após 500ms (quando o teclado já deve estar abrindo)
+    // Tentativa 4: Após 500ms (teclado totalmente aberto - crítico para Android 7)
     setTimeout(performScroll, 500);
 
-    // Tentativa 5: Após 800ms (garantia final)
+    // Tentativa 5: Após 800ms (garantia final após animações)
     setTimeout(performScroll, 800);
   };
 
@@ -699,7 +725,7 @@ const Tablet = () => {
           )}
         </div>
 
-        {/* Etapa 2 - Otimizada para Tablet */}
+        {/* Etapa 2 - Otimizada para Tablet e Android 7 */}
         {step !== 1 && (
           <Card className="mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full">
             {step === 2 && personType === 'colaborador' && (
@@ -713,6 +739,8 @@ const Tablet = () => {
                     <Input
                       ref={employeeBadgeInputRef}
                       type="number"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       id="cracha"
                       name="cracha"
                       value={employeeBadge}
@@ -725,6 +753,7 @@ const Tablet = () => {
                       placeholder="Digite a matrícula"
                       className="flex-1 h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                       required
+                      autoComplete="off"
                     />
                     <Button
                       type="button"
