@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,23 +51,8 @@ const Tablet = () => {
     }
   };
 
-  // Efeito para focar automaticamente nos campos quando entrar na etapa 2
-  useEffect(() => {
-    if (step === 2) {
-      // Foca no campo apropriado após um pequeno delay para garantir que o DOM foi atualizado
-      setTimeout(() => {
-        if (personType === 'colaborador' && employeeBadgeInputRef.current) {
-          employeeBadgeInputRef.current.focus();
-          // Chama o scroll após o foco para garantir que o campo fique visível quando o teclado abrir
-          scrollToInput(employeeBadgeInputRef);
-        } else if (personType === 'visitante' && visitorNameInputRef.current) {
-          visitorNameInputRef.current.focus();
-          // Chama o scroll após o foco para garantir que o campo fique visível quando o teclado abrir
-          scrollToInput(visitorNameInputRef);
-        }
-      }, 100);
-    }
-  }, [step, personType]);
+  // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
+  // O mecanismo de onFocus + scrollToInput nos inputs já resolve o problema de visibilidade do teclado
 
   const lookupEmployeeByBadge = async (badge: string): Promise<string | null> => {
     await new Promise((res) => setTimeout(res, 400));
