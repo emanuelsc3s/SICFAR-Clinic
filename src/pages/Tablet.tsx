@@ -54,6 +54,9 @@ const Tablet = () => {
   const initialViewportHeight = useRef<number | null>(null);
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
+  const stepTwoContainerRef = useRef<HTMLDivElement>(null);
+
+  const isLegacyKeyboardMode = isLegacyAndroid && isLegacyKeyboardVisible;
 
   const { state, dispatch } = useQueue();
   // -- Controle automático de tela cheia no Android/Opera Mini --
@@ -387,6 +390,37 @@ const Tablet = () => {
   // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
   // O handler de foco chama scrollToInput para manter o campo visível mesmo com o teclado aberto
 
+  const ensureLegacyStepVisible = useCallback(() => {
+    if (!isLegacyAndroid || step !== 2) return;
+    if (typeof window === 'undefined') return;
+
+    const root = layoutRootRef.current;
+    const target = stepTwoContainerRef.current;
+    if (!root || !target) return;
+
+    const align = () => {
+      const rootRect = root.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const offset = targetRect.top - rootRect.top;
+      const desiredTop = Math.max(root.scrollTop + offset - 12, 0);
+
+      root.scrollTo({
+        top: desiredTop,
+        behavior: 'smooth',
+      });
+    };
+
+    const tryAlign = (delay: number) => {
+      window.setTimeout(() => {
+        window.requestAnimationFrame(align);
+      }, delay);
+    };
+
+    tryAlign(0);
+    tryAlign(240);
+    tryAlign(520);
+  }, [isLegacyAndroid, step]);
+
   const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (keyboardVisibilityTimeout.current) {
       window.clearTimeout(keyboardVisibilityTimeout.current);
@@ -395,9 +429,19 @@ const Tablet = () => {
 
     if (isLegacyAndroid) {
       setIsLegacyKeyboardVisible(true);
+      const root = layoutRootRef.current;
+      if (root) {
+        window.requestAnimationFrame(() => {
+          root.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
     }
 
     scrollToInput(inputRef);
+
+    if (isLegacyAndroid) {
+      ensureLegacyStepVisible();
+    }
   };
 
   const handleInputBlur = () => {
@@ -441,7 +485,7 @@ const Tablet = () => {
     if (!isLegacyAndroid && isLegacyKeyboardVisible) {
       setIsLegacyKeyboardVisible(false);
     }
-  }, [isLegacyAndroid]);
+  }, [isLegacyAndroid, isLegacyKeyboardVisible]);
 
   useEffect(() => {
     if (!isLegacyAndroid) return;
@@ -455,6 +499,12 @@ const Tablet = () => {
       setLegacyKeyboardPadding(280);
     }
   }, [isLegacyKeyboardVisible, legacyKeyboardPadding]);
+
+  useEffect(() => {
+    if (isLegacyKeyboardMode) {
+      ensureLegacyStepVisible();
+    }
+  }, [isLegacyKeyboardMode, ensureLegacyStepVisible]);
 
   useEffect(() => {
     return () => {
@@ -471,6 +521,8 @@ const Tablet = () => {
   };
 
   const handleSearchBadge = async () => {
+    employeeBadgeInputRef.current?.blur();
+
     if (!employeeBadge.trim()) {
       setBadgeValid(false);
       return;
@@ -574,8 +626,6 @@ const Tablet = () => {
     }
   };
 
-  const isLegacyKeyboardMode = isLegacyAndroid && isLegacyKeyboardVisible;
-
   return (
     <div
       ref={layoutRootRef}
@@ -604,15 +654,10 @@ const Tablet = () => {
         <div
           className={cn(
             "text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0",
-            isLegacyKeyboardMode && "mb-0"
+            isLegacyKeyboardMode && "hidden"
           )}
         >
-          <div
-            className={cn(
-              "flex flex-col items-center justify-center gap-2 lg:gap-4 xl:gap-6 pt-8 lg:pt-16 xl:pt-20",
-              isLegacyKeyboardMode && "pt-2 lg:pt-4 xl:pt-6 gap-1"
-            )}
-          >
+          <div className="flex flex-col items-center justify-center gap-2 lg:gap-4 xl:gap-6 pt-8 lg:pt-16 xl:pt-20">
             <img
               src="/farmace.png"
               alt="Farmace"
@@ -628,7 +673,7 @@ const Tablet = () => {
         <div
           className={cn(
             "px-2 lg:px-6 pt-6 lg:pt-8 xl:pt-10 pb-1 lg:pb-3 xl:pb-4 mb-1 lg:mb-3 xl:mb-6 flex-shrink-0",
-            isLegacyKeyboardMode && "pt-2 lg:pt-3 xl:pt-4 pb-0 lg:pb-1 xl:pb-1 mb-0"
+            isLegacyKeyboardMode && "hidden"
           )}
         >
           <div className="flex items-center justify-between max-w-3xl mx-auto">
@@ -708,7 +753,12 @@ const Tablet = () => {
         </div>
 
         {/* Etapas do Wizard */}
-        <div className="flex-1 flex items-center justify-center px-2 lg:px-6 xl:px-8 min-h-0">
+        <div
+          className={cn(
+            "flex-1 flex items-center justify-center px-2 lg:px-6 xl:px-8 min-h-0",
+            isLegacyKeyboardMode && "hidden"
+          )}
+        >
           {step === 1 && (
             <div className="w-[400px] space-y-2 lg:space-y-4 xl:space-y-8 py-1">
               {/* Botão Visitante - Ultra Compacto para 1000x500, mantém touch 44x44px */}
@@ -833,7 +883,13 @@ const Tablet = () => {
 
         {/* Etapa 2 - Otimizada para Tablet e Android 7 */}
         {step !== 1 && (
-          <Card className="mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full">
+          <Card
+            ref={stepTwoContainerRef}
+            className={cn(
+              "mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full",
+              isLegacyKeyboardMode && "mt-0"
+            )}
+          >
             {step === 2 && personType === 'colaborador' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-1 sm:gap-2 p-4 sm:p-6">
                 <div className="space-y-1">
