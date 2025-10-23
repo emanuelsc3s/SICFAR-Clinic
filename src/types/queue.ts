@@ -9,6 +9,9 @@ export interface Patient {
   calledAt?: Date;
   consultingRoom?: string;
   attendant?: string;
+  // Novos campos opcionais para o fluxo do Wizard no Tablet
+  personType?: 'visitante' | 'colaborador';
+  name?: string;
 }
 
 export interface QueueStats {
