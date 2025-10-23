@@ -183,7 +183,7 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
 
   // Demais linhas
   chunks.push(alignLeft());
-  chunks.push(sizeDoubleWH());
+  chunks.push(sizeNormal());
   chunks.push(text(`Matricula: ${data.employeeBadge}`));
   chunks.push(lf());
   if (data.employeeName) {
