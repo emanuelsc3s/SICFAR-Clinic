@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
-import { UserCheck, AlertTriangle, IdCard, Search, User } from 'lucide-react';
+import { UserCheck, AlertTriangle, IdCard, Search, User, Check } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { printThermalTicket } from '@/utils/thermalPrinter';
-import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const Tablet = () => {
   // Estado do Wizard
@@ -179,49 +179,146 @@ const Tablet = () => {
           </div>
         </div>
 
-        {/* Wizard: Indicador de Progresso */}
-        <div className="px-3 mb-1">
-          <div className="flex items-center justify-between text-xs text-foreground/80 mb-1">
-            <span>Etapa {step} de 3</span>
-            <span>{step === 1 ? 'Tipo de Pessoa' : step === 2 ? 'Identificação' : 'Tipo de Senha'}</span>
+        {/* Wizard: Indicador de Progresso com Círculos */}
+        <div className="px-6 py-4 mb-4">
+          <div className="flex items-center justify-between max-w-2xl mx-auto">
+            {/* Etapa 1 */}
+            <div className="flex flex-col items-center flex-1">
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  step >= 1
+                    ? "bg-primary text-primary-foreground shadow-lg"
+                    : "bg-muted text-muted-foreground border-2 border-muted"
+                )}
+              >
+                {step > 1 ? <Check className="w-6 h-6" /> : "1"}
+              </div>
+              <span className="text-xs font-medium text-center text-foreground/80">
+                Tipo de<br />Pessoa
+              </span>
+            </div>
+
+            {/* Linha conectora 1-2 */}
+            <div className="flex-1 h-0.5 bg-muted mx-2 mb-8">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300",
+                  step >= 2 ? "bg-primary" : "bg-muted"
+                )}
+                style={{ width: step >= 2 ? '100%' : '0%' }}
+              />
+            </div>
+
+            {/* Etapa 2 */}
+            <div className="flex flex-col items-center flex-1">
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  step >= 2
+                    ? "bg-primary text-primary-foreground shadow-lg"
+                    : "bg-muted text-muted-foreground border-2 border-muted"
+                )}
+              >
+                {step > 2 ? <Check className="w-6 h-6" /> : "2"}
+              </div>
+              <span className="text-xs font-medium text-center text-foreground/80">
+                Identificação
+              </span>
+            </div>
+
+            {/* Linha conectora 2-3 */}
+            <div className="flex-1 h-0.5 bg-muted mx-2 mb-8">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300",
+                  step >= 3 ? "bg-primary" : "bg-muted"
+                )}
+                style={{ width: step >= 3 ? '100%' : '0%' }}
+              />
+            </div>
+
+            {/* Etapa 3 */}
+            <div className="flex flex-col items-center flex-1">
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  step >= 3
+                    ? "bg-primary text-primary-foreground shadow-lg"
+                    : "bg-muted text-muted-foreground border-2 border-muted"
+                )}
+              >
+                {step > 3 ? <Check className="w-6 h-6" /> : "3"}
+              </div>
+              <span className="text-xs font-medium text-center text-foreground/80">
+                Tipo de<br />Senha
+              </span>
+            </div>
           </div>
-          <Progress value={(step / 3) * 100} className="h-2" />
         </div>
 
         {/* Etapas do Wizard */}
-        <Card className="mb-1.5 shadow-elegant-lg border-0 bg-surface-elevated backdrop-blur-sm">
-          <CardContent className="p-3">
-            {step === 1 && (
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  className="h-20 text-base font-bold"
-                  variant={personType === 'visitante' ? 'default' : 'secondary'}
-                  onClick={() => {
-                    setPersonType('visitante');
-                    setEmployeeBadge('');
-                    setEmployeeName('');
-                    setVisitorName('');
-                    setBadgeValid(null);
-                    setStep(2);
-                  }}
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  Visitante
-                </Button>
-                <Button
-                  className="h-20 text-base font-bold"
-                  variant={personType === 'colaborador' ? 'default' : 'secondary'}
-                  onClick={() => {
-                    setPersonType('colaborador');
-                    setVisitorName('');
-                    setStep(2);
-                  }}
-                >
-                  <IdCard className="w-5 h-5 mr-2" />
-                  Colaborador
-                </Button>
-              </div>
-            )}
+        <div className="flex-1 flex items-center justify-center px-6">
+          {step === 1 && (
+            <div className="w-full max-w-2xl space-y-6">
+              {/* Botão Visitante */}
+              <Card
+                className="cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] bg-primary border-0 shadow-lg"
+                onClick={() => {
+                  setPersonType('visitante');
+                  setEmployeeBadge('');
+                  setEmployeeName('');
+                  setVisitorName('');
+                  setBadgeValid(null);
+                  setStep(2);
+                }}
+              >
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 rounded-2xl bg-white transition-colors">
+                      <User className="w-12 h-12 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold mb-2 text-white">Visitante</h3>
+                      <p className="text-sm text-white/90">
+                        Para pessoas sem matrícula de colaborador
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Botão Colaborador */}
+              <Card
+                className="cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] bg-primary border-0 shadow-lg"
+                onClick={() => {
+                  setPersonType('colaborador');
+                  setVisitorName('');
+                  setStep(2);
+                }}
+              >
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 rounded-2xl bg-white transition-colors">
+                      <IdCard className="w-12 h-12 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold mb-2 text-white">Colaborador</h3>
+                      <p className="text-sm text-white/90">
+                        Para funcionários com matrícula cadastrada
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+
+        {/* Etapa 2 e 3 - Mantém o Card original */}
+        {step !== 1 && (
+          <Card className="mb-1.5 shadow-elegant-lg border-0 bg-surface-elevated backdrop-blur-sm">
+            <CardContent className="p-3">
 
             {step === 2 && personType === 'colaborador' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -324,8 +421,9 @@ const Tablet = () => {
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Etapa 3 - Tipo de Senha */}
         {step === 3 && (
