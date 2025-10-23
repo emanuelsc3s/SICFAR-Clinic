@@ -43,7 +43,13 @@ const Tablet = () => {
   const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
   const [showAutoActivating, setShowAutoActivating] = useState(false);
 
+  // Ajustes específicos para Android 7 com teclado virtual
+  const [isLegacyAndroid, setIsLegacyAndroid] = useState(false);
+  const [isLegacyKeyboardVisible, setIsLegacyKeyboardVisible] = useState(false);
+
   // Refs para controle de scroll quando teclado abre
+  const layoutRootRef = useRef<HTMLDivElement>(null);
+  const keyboardVisibilityTimeout = useRef<number | null>(null);
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
 
@@ -322,37 +328,99 @@ const Tablet = () => {
   const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (!inputRef.current) return;
 
-    // Primeira tentativa: scroll imediato usando requestAnimationFrame
-    // Isso garante que o scroll aconteça após o próximo repaint do navegador
-    requestAnimationFrame(() => {
+    const ensureVisible = () => {
       inputRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
-        inline: 'nearest'
+        inline: 'nearest',
       });
-    });
+
+      if (isLegacyAndroid && typeof window !== 'undefined') {
+        const target = inputRef.current;
+        const rect = target.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const keyboardSafeSpace = 160; // margem extra para teclado numérico em tablets antigos
+        const bottomGap = viewportHeight - rect.bottom;
+
+        if (bottomGap < keyboardSafeSpace) {
+          const offset = keyboardSafeSpace - bottomGap;
+          const container = layoutRootRef.current;
+
+          if (container) {
+            container.scrollTop += offset;
+          } else {
+            window.scrollBy(0, offset);
+          }
+        }
+      }
+    };
+
+    // Primeira tentativa: scroll imediato usando requestAnimationFrame
+    requestAnimationFrame(ensureVisible);
 
     // Segunda tentativa: após 350ms (tempo para o teclado começar a abrir no Android 7)
-    setTimeout(() => {
-      inputRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
-    }, 350);
+    setTimeout(ensureVisible, 350);
 
     // Terceira tentativa: após 600ms (garantia para teclados mais lentos)
-    setTimeout(() => {
-      inputRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
-    }, 600);
+    setTimeout(ensureVisible, 600);
   };
 
   // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
-  // O mecanismo de onFocus + scrollToInput nos inputs já resolve o problema de visibilidade do teclado
+  // O handler de foco chama scrollToInput para manter o campo visível mesmo com o teclado aberto
+
+  const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
+    if (keyboardVisibilityTimeout.current) {
+      window.clearTimeout(keyboardVisibilityTimeout.current);
+      keyboardVisibilityTimeout.current = null;
+    }
+
+    if (isLegacyAndroid) {
+      setIsLegacyKeyboardVisible(true);
+    }
+
+    scrollToInput(inputRef);
+  };
+
+  const handleInputBlur = () => {
+    if (!isLegacyAndroid) return;
+
+    if (keyboardVisibilityTimeout.current) {
+      window.clearTimeout(keyboardVisibilityTimeout.current);
+    }
+
+    keyboardVisibilityTimeout.current = window.setTimeout(() => {
+      setIsLegacyKeyboardVisible(false);
+    }, 200);
+  };
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    if (!isAndroid()) return;
+    if (/Android 7/i.test(navigator.userAgent)) {
+      setIsLegacyAndroid(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLegacyAndroid && isLegacyKeyboardVisible) {
+      setIsLegacyKeyboardVisible(false);
+    }
+  }, [isLegacyAndroid]);
+
+  useEffect(() => {
+    if (!isLegacyAndroid) return;
+    if (step !== 2) {
+      setIsLegacyKeyboardVisible(false);
+    }
+  }, [isLegacyAndroid, step]);
+
+  useEffect(() => {
+    return () => {
+      if (keyboardVisibilityTimeout.current) {
+        window.clearTimeout(keyboardVisibilityTimeout.current);
+      }
+    };
+  }, []);
 
   const lookupEmployeeByBadge = async (badge: string): Promise<string | null> => {
     await new Promise((res) => setTimeout(res, 400));
@@ -466,7 +534,14 @@ const Tablet = () => {
 
   return (
     <div
-      className="h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in overflow-hidden"
+      ref={layoutRootRef}
+      className={cn(
+        "min-h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in",
+        isLegacyAndroid && isLegacyKeyboardVisible
+          ? "overflow-y-auto pb-40"
+          : "h-screen overflow-hidden"
+      )}
+      style={isLegacyAndroid && isLegacyKeyboardVisible ? { scrollPaddingBottom: '200px' } : undefined}
       onClickCapture={handleUserGestureForFullscreen}
       onTouchStartCapture={handleUserGestureForFullscreen}
       onPointerDownCapture={handleUserGestureForFullscreen}
@@ -712,7 +787,8 @@ const Tablet = () => {
                         setBadgeValid(null);
                         setEmployeeName('');
                       }}
-                      onFocus={() => scrollToInput(employeeBadgeInputRef)}
+                      onFocus={() => handleInputFocus(employeeBadgeInputRef)}
+                      onBlur={handleInputBlur}
                       placeholder="Digite a matrícula"
                       className="flex-1 h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                       required
@@ -788,7 +864,8 @@ const Tablet = () => {
                     name="nome-visitante"
                     value={visitorName}
                     onChange={(e) => setVisitorName(e.target.value)}
-                    onFocus={() => scrollToInput(visitorNameInputRef)}
+                    onFocus={() => handleInputFocus(visitorNameInputRef)}
+                    onBlur={handleInputBlur}
                     placeholder="Digite o nome completo"
                     className="h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                     required
