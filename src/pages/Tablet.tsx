@@ -46,10 +46,12 @@ const Tablet = () => {
   // Ajustes específicos para Android 7 com teclado virtual
   const [isLegacyAndroid, setIsLegacyAndroid] = useState(false);
   const [isLegacyKeyboardVisible, setIsLegacyKeyboardVisible] = useState(false);
+  const [legacyKeyboardPadding, setLegacyKeyboardPadding] = useState(280);
 
   // Refs para controle de scroll quando teclado abre
   const layoutRootRef = useRef<HTMLDivElement>(null);
   const keyboardVisibilityTimeout = useRef<number | null>(null);
+  const initialViewportHeight = useRef<number | null>(null);
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
 
@@ -339,8 +341,25 @@ const Tablet = () => {
         const target = inputRef.current;
         const rect = target.getBoundingClientRect();
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        const keyboardSafeSpace = 160; // margem extra para teclado numérico em tablets antigos
+
+        if (!initialViewportHeight.current || viewportHeight > initialViewportHeight.current) {
+          initialViewportHeight.current = viewportHeight;
+        }
+
+        const baselineHeight = initialViewportHeight.current ?? viewportHeight;
+        const keyboardHeight = Math.max(0, baselineHeight - viewportHeight);
+        const fallbackSafeSpace = rect.height + 240;
+        const computedSafeSpace = keyboardHeight > 0
+          ? keyboardHeight + rect.height + 120
+          : fallbackSafeSpace;
+        const keyboardSafeSpace = Math.max(fallbackSafeSpace, computedSafeSpace);
         const bottomGap = viewportHeight - rect.bottom;
+
+        const desiredPadding = Math.min(
+          520,
+          Math.max(280, Math.round(keyboardHeight + rect.height + 160))
+        );
+        setLegacyKeyboardPadding((prev) => (prev === desiredPadding ? prev : desiredPadding));
 
         if (bottomGap < keyboardSafeSpace) {
           const offset = keyboardSafeSpace - bottomGap;
@@ -402,6 +421,23 @@ const Tablet = () => {
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const updateBaseline = () => {
+      const viewport = window.innerHeight || document.documentElement.clientHeight;
+      if (!initialViewportHeight.current || viewport > initialViewportHeight.current) {
+        initialViewportHeight.current = viewport;
+      }
+    };
+
+    updateBaseline();
+    window.addEventListener('resize', updateBaseline);
+
+    return () => {
+      window.removeEventListener('resize', updateBaseline);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isLegacyAndroid && isLegacyKeyboardVisible) {
       setIsLegacyKeyboardVisible(false);
     }
@@ -413,6 +449,12 @@ const Tablet = () => {
       setIsLegacyKeyboardVisible(false);
     }
   }, [isLegacyAndroid, step]);
+
+  useEffect(() => {
+    if (!isLegacyKeyboardVisible && legacyKeyboardPadding !== 280) {
+      setLegacyKeyboardPadding(280);
+    }
+  }, [isLegacyKeyboardVisible, legacyKeyboardPadding]);
 
   useEffect(() => {
     return () => {
@@ -532,24 +574,45 @@ const Tablet = () => {
     }
   };
 
+  const isLegacyKeyboardMode = isLegacyAndroid && isLegacyKeyboardVisible;
+
   return (
     <div
       ref={layoutRootRef}
       className={cn(
         "min-h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in",
-        isLegacyAndroid && isLegacyKeyboardVisible
-          ? "overflow-y-auto pb-40"
+        isLegacyKeyboardMode
+          ? "overflow-y-auto"
           : "h-screen overflow-hidden"
       )}
-      style={isLegacyAndroid && isLegacyKeyboardVisible ? { scrollPaddingBottom: '200px' } : undefined}
+      style={
+        isLegacyKeyboardMode
+          ? { paddingBottom: legacyKeyboardPadding, scrollPaddingBottom: legacyKeyboardPadding }
+          : undefined
+      }
       onClickCapture={handleUserGestureForFullscreen}
       onTouchStartCapture={handleUserGestureForFullscreen}
       onPointerDownCapture={handleUserGestureForFullscreen}
     >
-      <div className="max-w-6xl mx-auto h-full flex flex-col">
+      <div
+        className={cn(
+          "max-w-6xl mx-auto flex flex-col",
+          isLegacyKeyboardMode ? "min-h-full" : "h-full"
+        )}
+      >
         {/* Header - Ultra Compacto para 1000x500 */}
-        <div className="text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0">
-          <div className="flex flex-col items-center justify-center gap-2 lg:gap-4 xl:gap-6 pt-8 lg:pt-16 xl:pt-20">
+        <div
+          className={cn(
+            "text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0",
+            isLegacyKeyboardMode && "mb-0"
+          )}
+        >
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center gap-2 lg:gap-4 xl:gap-6 pt-8 lg:pt-16 xl:pt-20",
+              isLegacyKeyboardMode && "pt-2 lg:pt-4 xl:pt-6 gap-1"
+            )}
+          >
             <img
               src="/farmace.png"
               alt="Farmace"
@@ -562,7 +625,12 @@ const Tablet = () => {
         </div>
 
         {/* Wizard: Indicador de Progresso - Ultra Compacto para 1000x500 */}
-        <div className="px-2 lg:px-6 pt-6 lg:pt-8 xl:pt-10 pb-1 lg:pb-3 xl:pb-4 mb-1 lg:mb-3 xl:mb-6 flex-shrink-0">
+        <div
+          className={cn(
+            "px-2 lg:px-6 pt-6 lg:pt-8 xl:pt-10 pb-1 lg:pb-3 xl:pb-4 mb-1 lg:mb-3 xl:mb-6 flex-shrink-0",
+            isLegacyKeyboardMode && "pt-2 lg:pt-3 xl:pt-4 pb-0 lg:pb-1 xl:pb-1 mb-0"
+          )}
+        >
           <div className="flex items-center justify-between max-w-3xl mx-auto">
             {/* Etapa 1 */}
             <div className="flex flex-col items-center flex-1">
