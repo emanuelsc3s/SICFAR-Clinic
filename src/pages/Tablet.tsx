@@ -316,38 +316,39 @@ const Tablet = () => {
     '004511': 'PAULO GUILHERME DE SOUSA DA SILVA',
   };
 
-  // Função para scroll até o elemento quando o teclado abre
-  // Solução AGRESSIVA para Android 7 onde o teclado cobre o campo
+  // Função para scroll suave até o elemento quando o teclado abre
+  // Especialmente útil para Android 7 onde o teclado cobre o campo
+  // Usa múltiplas tentativas de scroll para garantir que funcione no primeiro toque
   const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (!inputRef.current) return;
 
-    const element = inputRef.current;
+    // Primeira tentativa: scroll imediato usando requestAnimationFrame
+    // Isso garante que o scroll aconteça após o próximo repaint do navegador
+    requestAnimationFrame(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    });
 
-    // Função que força scroll para o topo da página de forma simples e direta
-    const performScroll = () => {
-      if (!element) return;
+    // Segunda tentativa: após 350ms (tempo para o teclado começar a abrir no Android 7)
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }, 350);
 
-      // Scroll para o topo absoluto da página
-      // Esta é a solução mais simples e confiável para Android 7
-      window.scrollTo(0, 0);
-
-      // Também força o scroll do body e html
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
-
-    // Executa imediatamente
-    performScroll();
-
-    // Continua executando em intervalos para combater o reposicionamento do Android
-    setTimeout(performScroll, 100);
-    setTimeout(performScroll, 200);
-    setTimeout(performScroll, 300);
-    setTimeout(performScroll, 400);
-    setTimeout(performScroll, 500);
-    setTimeout(performScroll, 600);
-    setTimeout(performScroll, 700);
-    setTimeout(performScroll, 800);
+    // Terceira tentativa: após 600ms (garantia para teclados mais lentos)
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }, 600);
   };
 
   // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
