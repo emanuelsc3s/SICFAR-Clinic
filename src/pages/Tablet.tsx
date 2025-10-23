@@ -163,47 +163,47 @@ const Tablet = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-subtle p-1.5 font-inter animate-fade-in overflow-hidden">
-      <div className="max-w-full mx-auto h-full flex flex-col">
-        {/* Ultra Compact Header - Optimized for 800x460 */}
-        <div className="text-center mb-1.5 animate-scale-in">
-          <div className="flex items-center justify-center">
+    <div className="h-screen bg-gradient-subtle p-3 sm:p-4 md:p-6 font-inter animate-fade-in overflow-hidden">
+      <div className="max-w-6xl mx-auto h-full flex flex-col">
+        {/* Header - Otimizado para Tablet (1280x800) */}
+        <div className="text-center mb-4 sm:mb-6 animate-scale-in">
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
             <img
               src="/farmace.png"
               alt="Farmace"
-              className="h-8 mr-2"
+              className="h-16 sm:h-20 md:h-24 drop-shadow-lg"
             />
-            <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               Ambulatório - Senha de Atendimento
             </h1>
           </div>
         </div>
 
-        {/* Wizard: Indicador de Progresso com Círculos */}
-        <div className="px-6 py-4 mb-4">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+        {/* Wizard: Indicador de Progresso com Círculos - Otimizado para Touch */}
+        <div className="px-4 sm:px-6 py-3 sm:py-4 mb-4 sm:mb-6">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
             {/* Etapa 1 */}
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
                   step >= 1
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 1 ? <Check className="w-6 h-6" /> : "1"}
+                {step > 1 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "1"}
               </div>
-              <span className="text-xs font-medium text-center text-foreground/80">
+              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Tipo de<br />Pessoa
               </span>
             </div>
 
             {/* Linha conectora 1-2 */}
-            <div className="flex-1 h-0.5 bg-muted mx-2 mb-8">
+            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-8 sm:mb-10 md:mb-12 rounded-full">
               <div
                 className={cn(
-                  "h-full transition-all duration-300",
+                  "h-full transition-all duration-200 rounded-full",
                   step >= 2 ? "bg-primary" : "bg-muted"
                 )}
                 style={{ width: step >= 2 ? '100%' : '0%' }}
@@ -214,24 +214,24 @@ const Tablet = () => {
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
                   step >= 2
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 2 ? <Check className="w-6 h-6" /> : "2"}
+                {step > 2 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "2"}
               </div>
-              <span className="text-xs font-medium text-center text-foreground/80">
+              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Identificação
               </span>
             </div>
 
             {/* Linha conectora 2-3 */}
-            <div className="flex-1 h-0.5 bg-muted mx-2 mb-8">
+            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-8 sm:mb-10 md:mb-12 rounded-full">
               <div
                 className={cn(
-                  "h-full transition-all duration-300",
+                  "h-full transition-all duration-200 rounded-full",
                   step >= 3 ? "bg-primary" : "bg-muted"
                 )}
                 style={{ width: step >= 3 ? '100%' : '0%' }}
@@ -242,15 +242,15 @@ const Tablet = () => {
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 mb-2",
+                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
                   step >= 3
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 3 ? <Check className="w-6 h-6" /> : "3"}
+                {step > 3 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "3"}
               </div>
-              <span className="text-xs font-medium text-center text-foreground/80">
+              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Tipo de<br />Senha
               </span>
             </div>
@@ -258,12 +258,12 @@ const Tablet = () => {
         </div>
 
         {/* Etapas do Wizard */}
-        <div className="flex-1 flex items-center justify-center px-6">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8">
           {step === 1 && (
-            <div className="w-full max-w-2xl space-y-6">
-              {/* Botão Visitante */}
+            <div className="w-full max-w-3xl space-y-5 sm:space-y-6 md:space-y-8">
+              {/* Botão Visitante - Otimizado para Touch (min 44x44px) */}
               <Card
-                className="cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] bg-primary border-0 shadow-lg"
+                className="cursor-pointer transition-all duration-200 active:scale-95 bg-primary border-0 shadow-xl"
                 onClick={() => {
                   setPersonType('visitante');
                   setEmployeeBadge('');
@@ -273,14 +273,14 @@ const Tablet = () => {
                   setStep(2);
                 }}
               >
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-6">
-                    <div className="p-4 rounded-2xl bg-white transition-colors">
-                      <User className="w-12 h-12 text-primary" />
+                <CardContent className="p-6 sm:p-8 md:p-10 min-h-[88px]">
+                  <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
+                    <div className="p-4 sm:p-5 md:p-6 rounded-2xl bg-white">
+                      <User className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold mb-2 text-white">Visitante</h3>
-                      <p className="text-sm text-white/90">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white">Visitante</h3>
+                      <p className="text-base sm:text-lg md:text-xl text-white/90">
                         Para pessoas sem matrícula de colaborador
                       </p>
                     </div>
@@ -288,23 +288,23 @@ const Tablet = () => {
                 </CardContent>
               </Card>
 
-              {/* Botão Colaborador */}
+              {/* Botão Colaborador - Otimizado para Touch (min 44x44px) */}
               <Card
-                className="cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] bg-primary border-0 shadow-lg"
+                className="cursor-pointer transition-all duration-200 active:scale-95 bg-primary border-0 shadow-xl"
                 onClick={() => {
                   setPersonType('colaborador');
                   setVisitorName('');
                   setStep(2);
                 }}
               >
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-6">
-                    <div className="p-4 rounded-2xl bg-white transition-colors">
-                      <IdCard className="w-12 h-12 text-primary" />
+                <CardContent className="p-6 sm:p-8 md:p-10 min-h-[88px]">
+                  <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
+                    <div className="p-4 sm:p-5 md:p-6 rounded-2xl bg-white">
+                      <IdCard className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold mb-2 text-white">Colaborador</h3>
-                      <p className="text-sm text-white/90">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white">Colaborador</h3>
+                      <p className="text-base sm:text-lg md:text-xl text-white/90">
                         Para funcionários com matrícula cadastrada
                       </p>
                     </div>
@@ -315,19 +315,19 @@ const Tablet = () => {
           )}
         </div>
 
-        {/* Etapa 2 e 3 - Mantém o Card original */}
+        {/* Etapa 2 - Otimizada para Tablet */}
         {step !== 1 && (
-          <Card className="mb-1.5 shadow-elegant-lg border-0 bg-surface-elevated backdrop-blur-sm">
-            <CardContent className="p-3">
+          <Card className="mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full">
+            <CardContent className="p-6 sm:p-8 md:p-10">
 
             {step === 2 && personType === 'colaborador' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label htmlFor="cracha" className="text-xs font-medium text-foreground flex items-center gap-1.5">
-                    <IdCard className="w-3.5 h-3.5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <div className="space-y-3 sm:space-y-4">
+                  <label htmlFor="cracha" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
+                    <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
                     Matrícula
                   </label>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-3">
                     <Input
                       type="number"
                       id="cracha"
@@ -339,32 +339,32 @@ const Tablet = () => {
                         setEmployeeName('');
                       }}
                       placeholder="Digite a matrícula"
-                      className="flex-1 h-9 text-sm"
+                      className="flex-1 h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                       required
                     />
                     <Button
                       type="button"
-                      size="sm"
+                      size="lg"
                       variant="outline"
                       onClick={handleSearchBadge}
-                      className="h-9 px-3"
+                      className="h-12 sm:h-14 md:h-16 px-4 sm:px-6 min-w-[48px]"
                       disabled={loadingBadge}
                       title="Validar matrícula"
                     >
-                      <Search className={`w-4 h-4 ${loadingBadge ? 'animate-pulse' : ''}`} />
+                      <Search className={`w-6 h-6 sm:w-7 sm:h-7 ${loadingBadge ? 'animate-pulse' : ''}`} />
                     </Button>
                   </div>
                   {badgeValid === true && (
-                    <p className="text-xs text-green-600">Matrícula válida</p>
+                    <p className="text-sm sm:text-base text-green-600 font-medium">✓ Matrícula válida</p>
                   )}
                   {badgeValid === false && (
-                    <p className="text-xs text-destructive">Matrícula inválida</p>
+                    <p className="text-sm sm:text-base text-destructive font-medium">✗ Matrícula inválida</p>
                   )}
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="nome-colab" className="text-xs font-medium text-foreground flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5" />
+                <div className="space-y-3 sm:space-y-4">
+                  <label htmlFor="nome-colab" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6" />
                     Nome do Colaborador
                   </label>
                   <Input
@@ -374,18 +374,23 @@ const Tablet = () => {
                     value={employeeName}
                     onChange={(e) => setEmployeeName(e.target.value)}
                     placeholder="Preenchido automaticamente"
-                    className="h-9 text-sm"
+                    className="h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                     disabled={badgeValid !== true}
                   />
                 </div>
 
-                <div className="col-span-full flex justify-between pt-2">
-                  <Button variant="secondary" onClick={() => setStep(1)}>
+                <div className="col-span-full flex justify-between gap-4 pt-4 sm:pt-6">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setStep(1)}
+                    className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
+                  >
                     Voltar
                   </Button>
                   <Button
                     onClick={() => setStep(3)}
                     disabled={!(employeeBadge.trim() && badgeValid === true && employeeName.trim())}
+                    className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
                   >
                     Avançar
                   </Button>
@@ -394,10 +399,10 @@ const Tablet = () => {
             )}
 
             {step === 2 && personType === 'visitante' && (
-              <div className="grid grid-cols-1 gap-3">
-                <div className="space-y-1.5">
-                  <label htmlFor="nome-visitante" className="text-xs font-medium text-foreground flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5" />
+              <div className="grid grid-cols-1 gap-6 sm:gap-8">
+                <div className="space-y-3 sm:space-y-4">
+                  <label htmlFor="nome-visitante" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6" />
                     Nome do Visitante
                   </label>
                   <Input
@@ -407,15 +412,23 @@ const Tablet = () => {
                     value={visitorName}
                     onChange={(e) => setVisitorName(e.target.value)}
                     placeholder="Digite o nome completo"
-                    className="h-9 text-sm"
+                    className="h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                     required
                   />
                 </div>
-                <div className="flex justify-between pt-2">
-                  <Button variant="secondary" onClick={() => setStep(1)}>
+                <div className="flex justify-between gap-4 pt-4 sm:pt-6">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setStep(1)}
+                    className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
+                  >
                     Voltar
                   </Button>
-                  <Button onClick={() => setStep(3)} disabled={!visitorName.trim()}>
+                  <Button
+                    onClick={() => setStep(3)}
+                    disabled={!visitorName.trim()}
+                    className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
+                  >
                     Avançar
                   </Button>
                 </div>
@@ -425,28 +438,28 @@ const Tablet = () => {
           </Card>
         )}
 
-        {/* Etapa 3 - Tipo de Senha */}
+        {/* Etapa 3 - Tipo de Senha - Otimizada para Tablet */}
         {step === 3 && (
-          <div className="flex flex-col flex-1">
-            <div className="flex justify-center gap-3 mb-1.5 flex-1 items-center px-4">
-              {/* Normal Password Card */}
+          <div className="flex flex-col flex-1 px-4 sm:px-6 md:px-8">
+            <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 md:gap-10 mb-6 sm:mb-8 flex-1 items-center max-w-4xl mx-auto w-full">
+              {/* Normal Password Card - Otimizado para Touch */}
               <Card
-                className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-300 cursor-pointer group flex flex-col w-[200px] hover:scale-105"
+                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[280px] md:w-[320px] lg:w-[360px]"
                 onClick={() => generatePassword('normal')}
               >
-                <CardContent className="p-3 text-center flex flex-col justify-between h-full">
-                  <div className="mb-2">
-                    <div className="p-2 bg-gradient-to-br from-success/10 to-success/5 rounded-lg w-fit mx-auto mb-2">
-                      <UserCheck className="w-8 h-8 text-success mx-auto" />
+                <CardContent className="p-6 sm:p-8 md:p-10 text-center flex flex-col justify-between min-h-[200px] sm:min-h-[240px]">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-success/10 to-success/5 rounded-2xl w-fit mx-auto mb-4 sm:mb-5">
+                      <UserCheck className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-success mx-auto" />
                     </div>
-                    <h2 className="text-lg font-bold text-foreground mb-1.5">NORMAL</h2>
-                    <Badge variant="outline" className="text-[11px] px-2 py-0.5 border border-success/30 text-success bg-success/5">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">NORMAL</h2>
+                    <Badge variant="outline" className="text-sm sm:text-base md:text-lg px-4 py-2 border-2 border-success/30 text-success bg-success/5">
                       Fila: {state.stats.normalQueue}
                     </Badge>
                   </div>
                   <Button
-                    size="sm"
-                    className="w-full text-sm py-2.5 h-9 bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-lg shadow-elegant-lg transition-all duration-300"
+                    size="lg"
+                    className="w-full text-base sm:text-lg md:text-xl py-4 sm:py-5 md:py-6 h-auto bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-xl shadow-xl transition-all duration-200 min-h-[48px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       generatePassword('normal');
@@ -457,24 +470,24 @@ const Tablet = () => {
                 </CardContent>
               </Card>
 
-              {/* Priority Password Card */}
+              {/* Priority Password Card - Otimizado para Touch */}
               <Card
-                className="shadow-elegant-xl hover:shadow-glow border-0 bg-surface-elevated transition-all duration-300 cursor-pointer group flex flex-col w-[200px] hover:scale-105"
+                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[280px] md:w-[320px] lg:w-[360px]"
                 onClick={() => generatePassword('priority')}
               >
-                <CardContent className="p-3 text-center flex flex-col justify-between h-full">
-                  <div className="mb-2">
-                    <div className="p-2 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-lg w-fit mx-auto mb-2">
-                      <AlertTriangle className="w-8 h-8 text-destructive mx-auto" />
+                <CardContent className="p-6 sm:p-8 md:p-10 text-center flex flex-col justify-between min-h-[200px] sm:min-h-[240px]">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-2xl w-fit mx-auto mb-4 sm:mb-5">
+                      <AlertTriangle className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-destructive mx-auto" />
                     </div>
-                    <h2 className="text-lg font-bold text-foreground mb-1.5">PRIORITÁRIA</h2>
-                    <Badge variant="outline" className="text-[11px] px-2 py-0.5 border border-destructive/30 text-destructive bg-destructive/5">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">PRIORITÁRIA</h2>
+                    <Badge variant="outline" className="text-sm sm:text-base md:text-lg px-4 py-2 border-2 border-destructive/30 text-destructive bg-destructive/5">
                       Fila: {state.stats.priorityQueue}
                     </Badge>
                   </div>
                   <Button
-                    size="sm"
-                    className="w-full text-sm py-2.5 h-9 bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-lg shadow-elegant-lg transition-all duration-300"
+                    size="lg"
+                    className="w-full text-base sm:text-lg md:text-xl py-4 sm:py-5 md:py-6 h-auto bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-xl shadow-xl transition-all duration-200 min-h-[48px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       generatePassword('priority');
@@ -485,8 +498,14 @@ const Tablet = () => {
                 </CardContent>
               </Card>
             </div>
-            <div className="px-4 pb-3 flex justify-start">
-              <Button variant="secondary" onClick={() => setStep(2)}>Voltar</Button>
+            <div className="pb-6 sm:pb-8 flex justify-start max-w-4xl mx-auto w-full">
+              <Button
+                variant="secondary"
+                onClick={() => setStep(2)}
+                className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
+              >
+                Voltar
+              </Button>
             </div>
           </div>
         )}
