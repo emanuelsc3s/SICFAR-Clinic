@@ -142,8 +142,8 @@ const Tablet = () => {
 
           if (!alreadyInFullscreen) {
             // Não está em fullscreen após retornar do RawBT
-            // Aguarda 3.0 segundos e então simula um clique automático para ativar fullscreen
-            console.log('[SICFAR] Fullscreen perdido após RawBT, ativando automaticamente em 3.0s...');
+            // Aguarda 5.0 segundos e então simula um clique automático para ativar fullscreen
+            console.log('[SICFAR] Fullscreen perdido após RawBT, ativando automaticamente em 5.0s...');
 
             // Exibe indicador visual de ativação automática
             setShowAutoActivating(true);
@@ -171,7 +171,7 @@ const Tablet = () => {
                   setShowFullscreenPrompt(true);
                 }
               }, 100);
-            }, 3000);
+            }, 5000);
           } else {
             console.log('[SICFAR] Fullscreen mantido após RawBT');
           }
