@@ -317,74 +317,36 @@ const Tablet = () => {
   };
 
   // Função para scroll até o elemento quando o teclado abre
-  // Especialmente útil para Android 7 onde o teclado cobre o campo
-  // Usa múltiplas tentativas com scroll instantâneo (sem animação) para máxima confiabilidade
+  // Solução AGRESSIVA para Android 7 onde o teclado cobre o campo
   const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (!inputRef.current) return;
 
     const element = inputRef.current;
 
-    // Função auxiliar para fazer o scroll de forma mais agressiva
+    // Função que força scroll para o topo da página de forma simples e direta
     const performScroll = () => {
       if (!element) return;
 
-      try {
-        // Método 1: scrollIntoView sem animação (mais confiável no Android)
-        // No Android 7, usar 'start' garante que o campo fique visível acima do teclado
-        element.scrollIntoView({
-          behavior: 'auto', // 'auto' em vez de 'smooth' para scroll instantâneo
-          block: 'start',   // 'start' posiciona o elemento no topo da viewport
-          inline: 'nearest'
-        });
-      } catch (e) {
-        console.debug('[SICFAR] scrollIntoView falhou:', e);
-      }
+      // Scroll para o topo absoluto da página
+      // Esta é a solução mais simples e confiável para Android 7
+      window.scrollTo(0, 0);
 
-      try {
-        // Método 2: scroll manual usando getBoundingClientRect (fallback para Android 7)
-        // Este método é mais compatível com navegadores antigos
-        const rect = element.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        // Calcula a posição ideal: elemento no topo com margem de 20px
-        // Margem reduzida de 100px para 20px para maximizar espaço visível
-        const targetY = rect.top + scrollTop - 20;
-
-        window.scrollTo({
-          top: Math.max(0, targetY), // Garante que não role para valores negativos
-          behavior: 'auto'
-        });
-      } catch (e) {
-        console.debug('[SICFAR] window.scrollTo falhou:', e);
-      }
-
-      try {
-        // Método 3: Fallback adicional para Android 7 usando scrollTop direto
-        // Alguns navegadores antigos não suportam window.scrollTo com objeto
-        const rect = element.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const targetY = Math.max(0, rect.top + scrollTop - 20);
-
-        document.documentElement.scrollTop = targetY;
-        document.body.scrollTop = targetY; // Para navegadores muito antigos
-      } catch (e) {
-        console.debug('[SICFAR] scrollTop direto falhou:', e);
-      }
+      // Também força o scroll do body e html
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     };
 
-    // Tentativa 1: Imediata (antes do teclado começar a abrir)
+    // Executa imediatamente
     performScroll();
 
-    // Tentativa 2: Após 100ms (teclado começando a abrir)
+    // Continua executando em intervalos para combater o reposicionamento do Android
     setTimeout(performScroll, 100);
-
-    // Tentativa 3: Após 300ms (teclado parcialmente aberto)
+    setTimeout(performScroll, 200);
     setTimeout(performScroll, 300);
-
-    // Tentativa 4: Após 500ms (teclado totalmente aberto - crítico para Android 7)
+    setTimeout(performScroll, 400);
     setTimeout(performScroll, 500);
-
-    // Tentativa 5: Após 800ms (garantia final após animações)
+    setTimeout(performScroll, 600);
+    setTimeout(performScroll, 700);
     setTimeout(performScroll, 800);
   };
 
