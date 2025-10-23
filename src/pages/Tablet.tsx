@@ -38,17 +38,37 @@ const Tablet = () => {
 
   // Função para scroll suave até o elemento quando o teclado abre
   // Especialmente útil para Android 7 onde o teclado cobre o campo
+  // Usa múltiplas tentativas de scroll para garantir que funcione no primeiro toque
   const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
-    if (inputRef.current) {
-      // Aguarda um pequeno delay para o teclado começar a abrir
-      setTimeout(() => {
-        inputRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center', // Centraliza o campo na viewport
-          inline: 'nearest'
-        });
-      }, 300); // 300ms é suficiente para detectar a abertura do teclado
-    }
+    if (!inputRef.current) return;
+
+    // Primeira tentativa: scroll imediato usando requestAnimationFrame
+    // Isso garante que o scroll aconteça após o próximo repaint do navegador
+    requestAnimationFrame(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    });
+
+    // Segunda tentativa: após 350ms (tempo para o teclado começar a abrir no Android 7)
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }, 350);
+
+    // Terceira tentativa: após 600ms (garantia para teclados mais lentos)
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }, 600);
   };
 
   // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
