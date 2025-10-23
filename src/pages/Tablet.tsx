@@ -323,7 +323,7 @@ const Tablet = () => {
         </div>
 
         {/* Etapas do Wizard */}
-        <div className="flex-1 flex items-center justify-center px-2 lg:px-6 xl:px-8 overflow-y-auto min-h-0">
+        <div className="flex-1 flex items-center justify-center px-2 lg:px-6 xl:px-8 min-h-0">
           {step === 1 && (
             <div className="w-[400px] space-y-2 lg:space-y-4 xl:space-y-8 py-1">
               {/* Botão Visitante - Ultra Compacto para 1000x500, mantém touch 44x44px */}
@@ -376,6 +376,72 @@ const Tablet = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {/* Etapa 3 - Tipo de Senha - Ajustada para caber sem scroll */}
+          {step === 3 && (
+            <div className="flex flex-col w-full px-2 sm:px-4 md:px-6 lg:px-8 py-1 sm:py-2">
+              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 mt-8 sm:mt-10 md:mt-12 lg:mt-14 mb-2 sm:mb-3 md:mb-4 lg:mb-6 items-center max-w-4xl mx-auto w-full">
+                {/* Normal Password Card - Otimizado para Touch */}
+                <Card
+                  className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
+                  onClick={() => generatePassword('normal')}
+                >
+                  <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 text-center flex flex-col justify-between min-h-[120px] sm:min-h-[140px] md:min-h-[160px] lg:min-h-[200px]">
+                    <div className="mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">
+                      <div className="p-1.5 sm:p-2 md:p-3 lg:p-4 bg-gradient-to-br from-success/10 to-success/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">
+                        <UserCheck className="w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 text-success mx-auto" />
+                      </div>
+                      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground">NORMAL</h2>
+                    </div>
+                    <Button
+                      size="lg"
+                      className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-1.5 sm:py-2 md:py-2.5 lg:py-3 h-auto bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        generatePassword('normal');
+                      }}
+                    >
+                      Gerar Senha
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Priority Password Card - Otimizado para Touch */}
+                <Card
+                  className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
+                  onClick={() => generatePassword('priority')}
+                >
+                  <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 text-center flex flex-col justify-between min-h-[120px] sm:min-h-[140px] md:min-h-[160px] lg:min-h-[200px]">
+                    <div className="mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">
+                      <div className="p-1.5 sm:p-2 md:p-3 lg:p-4 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-1.5 sm:mb-2 md:mb-3 lg:mb-4">
+                        <AlertTriangle className="w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 text-destructive mx-auto" />
+                      </div>
+                      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground">PRIORITÁRIA</h2>
+                    </div>
+                    <Button
+                      size="lg"
+                      className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-1.5 sm:py-2 md:py-2.5 lg:py-3 h-auto bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        generatePassword('priority');
+                      }}
+                    >
+                      Gerar Senha
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="pb-1 sm:pb-2 md:pb-3 lg:pb-4 flex justify-start max-w-4xl mx-auto w-full">
+                <Button
+                  variant="secondary"
+                  onClick={() => setStep(2)}
+                  className="h-10 sm:h-11 md:h-12 lg:h-14 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base lg:text-lg min-w-[100px] sm:min-w-[120px]"
+                >
+                  Voltar
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -502,72 +568,6 @@ const Tablet = () => {
               </div>
             )}
           </Card>
-        )}
-
-        {/* Etapa 3 - Tipo de Senha - Otimizada para Tablet */}
-        {step === 3 && (
-          <div className="flex flex-col flex-1 px-2 sm:px-4 md:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 mb-3 sm:mb-4 md:mb-6 lg:mb-8 flex-1 items-center max-w-4xl mx-auto w-full">
-              {/* Normal Password Card - Otimizado para Touch */}
-              <Card
-                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
-                onClick={() => generatePassword('normal')}
-              >
-                <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8 text-center flex flex-col justify-between min-h-[140px] sm:min-h-[160px] md:min-h-[200px] lg:min-h-[240px]">
-                  <div className="mb-2 sm:mb-3 md:mb-4 lg:mb-6">
-                    <div className="p-2 sm:p-3 md:p-4 lg:p-5 bg-gradient-to-br from-success/10 to-success/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-2 sm:mb-3 md:mb-4 lg:mb-5">
-                      <UserCheck className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-success mx-auto" />
-                    </div>
-                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground">NORMAL</h2>
-                  </div>
-                  <Button
-                    size="lg"
-                    className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-2.5 md:py-3 lg:py-4 h-auto bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[40px] sm:min-h-[44px] md:min-h-[48px]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      generatePassword('normal');
-                    }}
-                  >
-                    Gerar Senha
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Priority Password Card - Otimizado para Touch */}
-              <Card
-                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
-                onClick={() => generatePassword('priority')}
-              >
-                <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8 text-center flex flex-col justify-between min-h-[140px] sm:min-h-[160px] md:min-h-[200px] lg:min-h-[240px]">
-                  <div className="mb-2 sm:mb-3 md:mb-4 lg:mb-6">
-                    <div className="p-2 sm:p-3 md:p-4 lg:p-5 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-2 sm:mb-3 md:mb-4 lg:mb-5">
-                      <AlertTriangle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-destructive mx-auto" />
-                    </div>
-                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground">PRIORITÁRIA</h2>
-                  </div>
-                  <Button
-                    size="lg"
-                    className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-2.5 md:py-3 lg:py-4 h-auto bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[40px] sm:min-h-[44px] md:min-h-[48px]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      generatePassword('priority');
-                    }}
-                  >
-                    Gerar Senha
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="pb-3 sm:pb-4 md:pb-6 lg:pb-8 flex justify-start max-w-4xl mx-auto w-full">
-              <Button
-                variant="secondary"
-                onClick={() => setStep(2)}
-                className="h-10 sm:h-11 md:h-12 lg:h-14 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base lg:text-lg min-w-[100px] sm:min-w-[120px]"
-              >
-                Voltar
-              </Button>
-            </div>
-          </div>
         )}
       </div>
 
