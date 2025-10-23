@@ -44,6 +44,97 @@ const Tablet = () => {
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
 
   const { state, dispatch } = useQueue();
+  // -- Controle automático de tela cheia no Android/Opera Mini --
+  // Tentamos restaurar a tela cheia quando a página volta ao foco após imprimir no RawBT
+  const getFullscreenElement = () => {
+    const doc = document as Document & {
+      webkitFullscreenElement?: Element | null;
+      mozFullScreenElement?: Element | null;
+      msFullscreenElement?: Element | null;
+    };
+    return document.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement || null;
+  };
+
+  const requestFullscreen = async (el: HTMLElement) => {
+    const anyEl = el as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      mozRequestFullScreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+    try {
+      if (el.requestFullscreen) return await el.requestFullscreen();
+      if (anyEl.webkitRequestFullscreen) return await anyEl.webkitRequestFullscreen();
+      if (anyEl.mozRequestFullScreen) return await anyEl.mozRequestFullScreen();
+      if (anyEl.msRequestFullscreen) return await anyEl.msRequestFullscreen();
+    } catch (e) {
+      console.warn('[SICFAR] Falha ao entrar em fullscreen:', e);
+      throw e;
+    }
+  };
+
+  const tryHideAddressBar = () => {
+    // Hack antigo para esconder a barra de endereço em navegadores antigos
+    setTimeout(() => {
+      try { window.scrollTo(0, 1); } catch (e) { void e; }
+    }, 200);
+  };
+
+  const ensureFullscreen = useCallback(async () => {
+    if (!isAndroid()) return;
+    try {
+      const el = document.documentElement as HTMLElement;
+      const already = !!getFullscreenElement();
+      if (!already) {
+        await requestFullscreen(el);
+        tryHideAddressBar();
+      }
+    } catch {
+      // Alguns navegadores (ex.: Opera Mini) podem não suportar a Fullscreen API
+      tryHideAddressBar();
+    }
+  }, []);
+
+  const handleUserGestureForFullscreen = useCallback(() => {
+    if (!isAndroid()) return;
+    if (!getFullscreenElement()) {
+      void ensureFullscreen();
+    }
+  }, [ensureFullscreen]);
+
+  useEffect(() => {
+    const key = 'SICFAR_FS_RESTORE';
+
+    const onRestore = () => {
+      if (!isAndroid()) return;
+      if (document.visibilityState === 'visible') {
+        // Tentamos sempre que voltar para a aba; a flag melhora o sinal do retorno do RawBT
+        const should = (() => {
+          try { return sessionStorage.getItem(key); } catch (e) { return null; }
+        })();
+        if (should === '1' || !getFullscreenElement()) {
+          setTimeout(() => { void ensureFullscreen(); }, 120);
+          setTimeout(() => { void ensureFullscreen(); }, 500);
+          setTimeout(() => { void ensureFullscreen(); }, 1200);
+          try { sessionStorage.removeItem(key); } catch (e) { void e; }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', onRestore);
+    window.addEventListener('focus', onRestore);
+    window.addEventListener('pageshow', onRestore);
+
+    // Tenta ativar fullscreen logo após montar (pode ser ignorado se exigir gesto do usuário)
+    const t = setTimeout(() => { void ensureFullscreen(); }, 300);
+
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener('visibilitychange', onRestore);
+      window.removeEventListener('focus', onRestore);
+      window.removeEventListener('pageshow', onRestore);
+    };
+  }, [ensureFullscreen]);
+
 
   // Lista hardcoded de colaboradores para testes
   // Formato: matrícula (6 dígitos) + nome completo (ignorando data no final)
@@ -193,7 +284,7 @@ const Tablet = () => {
       // Impressão térmica via RawBT (Android) com ESC/POS
       try {
         // Marca que devemos restaurar fullscreen ao retornar do RawBT
-        try { sessionStorage.setItem('SICFAR_FS_RESTORE', '1'); } catch {}
+        try { sessionStorage.setItem('SICFAR_FS_RESTORE', '1'); } catch (e) { void e; }
         await printThermalTicket(ticket);
       } catch (err) {
         console.error('Erro ao imprimir senha:', err);
@@ -214,7 +305,7 @@ const Tablet = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in overflow-hidden">
+    <div className="h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in overflow-hidden" onClickCapture={handleUserGestureForFullscreen} onTouchStartCapture={handleUserGestureForFullscreen}>
       <div className="max-w-6xl mx-auto h-full flex flex-col">
         {/* Header - Ultra Compacto para 1000x500 */}
         <div className="text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0">
