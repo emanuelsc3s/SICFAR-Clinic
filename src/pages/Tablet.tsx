@@ -360,11 +360,11 @@ const Tablet = () => {
         {/* Etapa 2 - Otimizada para Tablet */}
         {step !== 1 && (
           <Card className="mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full">
-            <CardContent className="p-6 sm:p-8 md:p-10">
+            <CardContent className="p-4 sm:p-6 md:p-8">
 
             {step === 2 && personType === 'colaborador' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 sm:gap-2">
+                <div className="space-y-1">
                   <label htmlFor="cracha" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
                     Matrícula
@@ -406,7 +406,7 @@ const Tablet = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label htmlFor="nome-colab" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <User className="w-5 h-5 sm:w-6 sm:h-6" />
                     Nome do Colaborador
