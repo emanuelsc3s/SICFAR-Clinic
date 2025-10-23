@@ -48,6 +48,8 @@ const GS = 0x1d;  // group separator
 
 function init(): Uint8Array { return new Uint8Array([ESC, 0x40]); } // ESC @
 function alignCenter(): Uint8Array { return new Uint8Array([ESC, 0x61, 0x01]); } // ESC a 1
+function alignLeft(): Uint8Array { return new Uint8Array([ESC, 0x61, 0x00]); } // ESC a 0
+
 function bold(on: boolean): Uint8Array { return new Uint8Array([ESC, 0x45, on ? 1 : 0]); } // ESC E n
 function sizeNormal(): Uint8Array { return new Uint8Array([GS, 0x21, 0x00]); } // GS ! 0
 function sizeDoubleWH(): Uint8Array { return new Uint8Array([GS, 0x21, 0x11]); } // 2x largura e altura
@@ -180,12 +182,15 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(lf(10));
 
   // Demais linhas
+  chunks.push(alignLeft());
+  chunks.push(sizeDoubleWH());
   chunks.push(text(`Matricula: ${data.employeeBadge}`));
   chunks.push(lf());
   if (data.employeeName) {
     chunks.push(text(`Paciente: ${data.employeeName}`));
     chunks.push(lf());
   }
+  chunks.push(alignCenter()); // restaura alinhamento central para as próximas linhas
   chunks.push(text(dateTime));
   chunks.push(lf(2));
 
