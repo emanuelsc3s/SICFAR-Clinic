@@ -159,7 +159,7 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(text('ATENDIMENTO AMBULATORIAL'));
   chunks.push(bold(false));
   chunks.push(sizeNormal());
-  chunks.push(lf());
+  chunks.push(lf(10));
 
   // Número da senha em destaque (2x) + negrito
   chunks.push(sizeDoubleWH());
@@ -167,7 +167,7 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(text(data.number));
   chunks.push(bold(false));
   chunks.push(sizeNormal());
-  chunks.push(lf());
+  chunks.push(lf(10));
 
   // Demais linhas
   chunks.push(text(`Matrícula: ${data.employeeBadge}`));
