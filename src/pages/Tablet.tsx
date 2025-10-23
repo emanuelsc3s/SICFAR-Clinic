@@ -3,7 +3,15 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
 import { UserCheck, AlertTriangle, IdCard, Search, User, Check } from 'lucide-react';
@@ -22,6 +30,7 @@ const Tablet = () => {
   const [visitorName, setVisitorName] = useState('');
   const [loadingBadge, setLoadingBadge] = useState(false);
   const [badgeValid, setBadgeValid] = useState<boolean | null>(null);
+  const [showBadgeNotFoundDialog, setShowBadgeNotFoundDialog] = useState(false);
 
   // Refs para controle de scroll quando teclado abre
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
@@ -116,18 +125,12 @@ const Tablet = () => {
       if (name) {
         setEmployeeName(name);
         setBadgeValid(true);
-        toast({
-          title: "Colaborador encontrado",
-          description: `${name}`,
-        });
+        // Matrícula encontrada: não exibir notificação (removido toast de sucesso)
       } else {
         setEmployeeName('');
         setBadgeValid(false);
-        toast({
-          title: "Matrícula não encontrada",
-          description: `Verifique o número digitado e tente novamente`,
-          variant: "destructive",
-        });
+        // Matrícula não encontrada: exibir AlertDialog
+        setShowBadgeNotFoundDialog(true);
       }
     } finally {
       setLoadingBadge(false);
@@ -380,10 +383,8 @@ const Tablet = () => {
         {/* Etapa 2 - Otimizada para Tablet */}
         {step !== 1 && (
           <Card className="mb-4 sm:mb-6 shadow-xl border-0 bg-surface-elevated max-w-3xl mx-auto w-full">
-            <CardContent className="p-4 sm:p-6 md:p-8">
-
             {step === 2 && personType === 'colaborador' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 sm:gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 sm:gap-2 p-4 sm:p-6">
                 <div className="space-y-1">
                   <label htmlFor="cracha" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -463,7 +464,7 @@ const Tablet = () => {
             )}
 
             {step === 2 && personType === 'visitante' && (
-              <div className="grid grid-cols-1 gap-6 sm:gap-8">
+              <div className="grid grid-cols-1 gap-6 sm:gap-8 p-4 sm:p-6">
                 <div className="space-y-3 sm:space-y-4">
                   <label htmlFor="nome-visitante" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <User className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -500,32 +501,28 @@ const Tablet = () => {
                 </div>
               </div>
             )}
-            </CardContent>
           </Card>
         )}
 
         {/* Etapa 3 - Tipo de Senha - Otimizada para Tablet */}
         {step === 3 && (
-          <div className="flex flex-col flex-1 px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 md:gap-10 mb-6 sm:mb-8 flex-1 items-center max-w-4xl mx-auto w-full">
+          <div className="flex flex-col flex-1 px-2 sm:px-4 md:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 mb-3 sm:mb-4 md:mb-6 lg:mb-8 flex-1 items-center max-w-4xl mx-auto w-full">
               {/* Normal Password Card - Otimizado para Touch */}
               <Card
-                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[280px] md:w-[320px] lg:w-[360px]"
+                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
                 onClick={() => generatePassword('normal')}
               >
-                <CardContent className="p-6 sm:p-8 md:p-10 text-center flex flex-col justify-between min-h-[200px] sm:min-h-[240px]">
-                  <div className="mb-4 sm:mb-6">
-                    <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-success/10 to-success/5 rounded-2xl w-fit mx-auto mb-4 sm:mb-5">
-                      <UserCheck className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-success mx-auto" />
+                <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8 text-center flex flex-col justify-between min-h-[140px] sm:min-h-[160px] md:min-h-[200px] lg:min-h-[240px]">
+                  <div className="mb-2 sm:mb-3 md:mb-4 lg:mb-6">
+                    <div className="p-2 sm:p-3 md:p-4 lg:p-5 bg-gradient-to-br from-success/10 to-success/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+                      <UserCheck className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-success mx-auto" />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">NORMAL</h2>
-                    <Badge variant="outline" className="text-sm sm:text-base md:text-lg px-4 py-2 border-2 border-success/30 text-success bg-success/5">
-                      Fila: {state.stats.normalQueue}
-                    </Badge>
+                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground">NORMAL</h2>
                   </div>
                   <Button
                     size="lg"
-                    className="w-full text-base sm:text-lg md:text-xl py-4 sm:py-5 md:py-6 h-auto bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-xl shadow-xl transition-all duration-200 min-h-[48px]"
+                    className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-2.5 md:py-3 lg:py-4 h-auto bg-gradient-to-r from-success to-success/90 hover:from-success/90 hover:to-success text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[40px] sm:min-h-[44px] md:min-h-[48px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       generatePassword('normal');
@@ -538,22 +535,19 @@ const Tablet = () => {
 
               {/* Priority Password Card - Otimizado para Touch */}
               <Card
-                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[280px] md:w-[320px] lg:w-[360px]"
+                className="shadow-xl border-0 bg-surface-elevated transition-all duration-200 cursor-pointer active:scale-95 flex flex-col w-full sm:w-[240px] md:w-[280px] lg:w-[320px]"
                 onClick={() => generatePassword('priority')}
               >
-                <CardContent className="p-6 sm:p-8 md:p-10 text-center flex flex-col justify-between min-h-[200px] sm:min-h-[240px]">
-                  <div className="mb-4 sm:mb-6">
-                    <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-2xl w-fit mx-auto mb-4 sm:mb-5">
-                      <AlertTriangle className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-destructive mx-auto" />
+                <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8 text-center flex flex-col justify-between min-h-[140px] sm:min-h-[160px] md:min-h-[200px] lg:min-h-[240px]">
+                  <div className="mb-2 sm:mb-3 md:mb-4 lg:mb-6">
+                    <div className="p-2 sm:p-3 md:p-4 lg:p-5 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-xl sm:rounded-2xl w-fit mx-auto mb-2 sm:mb-3 md:mb-4 lg:mb-5">
+                      <AlertTriangle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-destructive mx-auto" />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">PRIORITÁRIA</h2>
-                    <Badge variant="outline" className="text-sm sm:text-base md:text-lg px-4 py-2 border-2 border-destructive/30 text-destructive bg-destructive/5">
-                      Fila: {state.stats.priorityQueue}
-                    </Badge>
+                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground">PRIORITÁRIA</h2>
                   </div>
                   <Button
                     size="lg"
-                    className="w-full text-base sm:text-lg md:text-xl py-4 sm:py-5 md:py-6 h-auto bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-xl shadow-xl transition-all duration-200 min-h-[48px]"
+                    className="w-full text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-2.5 md:py-3 lg:py-4 h-auto bg-gradient-to-r from-destructive to-destructive/90 hover:from-destructive/90 hover:to-destructive text-white font-bold rounded-lg sm:rounded-xl shadow-xl transition-all duration-200 min-h-[40px] sm:min-h-[44px] md:min-h-[48px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       generatePassword('priority');
@@ -564,11 +558,11 @@ const Tablet = () => {
                 </CardContent>
               </Card>
             </div>
-            <div className="pb-6 sm:pb-8 flex justify-start max-w-4xl mx-auto w-full">
+            <div className="pb-3 sm:pb-4 md:pb-6 lg:pb-8 flex justify-start max-w-4xl mx-auto w-full">
               <Button
                 variant="secondary"
                 onClick={() => setStep(2)}
-                className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 text-base sm:text-lg md:text-xl min-w-[120px]"
+                className="h-10 sm:h-11 md:h-12 lg:h-14 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base lg:text-lg min-w-[100px] sm:min-w-[120px]"
               >
                 Voltar
               </Button>
@@ -576,6 +570,31 @@ const Tablet = () => {
           </div>
         )}
       </div>
+
+      {/* AlertDialog para matrícula não encontrada */}
+      <AlertDialog open={showBadgeNotFoundDialog} onOpenChange={setShowBadgeNotFoundDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-destructive">
+              Matrícula não encontrada
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              A matrícula <strong>{employeeBadge}</strong> não foi localizada no sistema.
+              <br />
+              <br />
+              Por favor, verifique o número digitado e tente novamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setShowBadgeNotFoundDialog(false)}
+              className="h-12 px-6 text-base"
+            >
+              Entendi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
