@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,11 +12,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
 import { useQueue } from '@/context/QueueContext';
 import { Patient } from '@/types/queue';
 import { UserCheck, AlertTriangle, IdCard, Search, User, Check } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { printThermalTicket } from '@/utils/thermalPrinter';
+import { printThermalTicket, isAndroid, isRealAndroidDevice, TicketData } from '@/utils/thermalPrinter';
 import { cn } from '@/lib/utils';
 
 const Tablet = () => {
@@ -31,6 +34,10 @@ const Tablet = () => {
   const [loadingBadge, setLoadingBadge] = useState(false);
   const [badgeValid, setBadgeValid] = useState<boolean | null>(null);
   const [showBadgeNotFoundDialog, setShowBadgeNotFoundDialog] = useState(false);
+
+  // Estados para preview do ticket térmico (browser não-Android)
+  const [showTicketPreview, setShowTicketPreview] = useState(false);
+  const [ticketData, setTicketData] = useState<TicketData | null>(null);
 
   // Refs para controle de scroll quando teclado abre
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
@@ -108,11 +115,6 @@ const Tablet = () => {
   const handleSearchBadge = async () => {
     if (!employeeBadge.trim()) {
       setBadgeValid(false);
-      toast({
-        title: "Erro",
-        description: "Por favor, insira o número da matrícula",
-        variant: "destructive",
-      });
       return;
     }
     setLoadingBadge(true);
@@ -141,36 +143,16 @@ const Tablet = () => {
     // Validações por tipo de pessoa
     if (personType === 'colaborador') {
       if (!employeeBadge.trim()) {
-        toast({
-          title: "Erro",
-          description: "Por favor, informe a matrícula do colaborador",
-          variant: "destructive",
-        });
         return;
       }
       if (badgeValid !== true || !employeeName.trim()) {
-        toast({
-          title: "Validação pendente",
-          description: "Valide a matrícula para continuar",
-          variant: "destructive",
-        });
         return;
       }
     } else if (personType === 'visitante') {
       if (!visitorName.trim()) {
-        toast({
-          title: "Erro",
-          description: "Informe o nome do visitante",
-          variant: "destructive",
-        });
         return;
       }
     } else {
-      toast({
-        title: "Selecione o tipo de pessoa",
-        description: "Escolha Visitante ou Colaborador",
-        variant: "destructive",
-      });
       setStep(1);
       return;
     }
@@ -196,35 +178,39 @@ const Tablet = () => {
 
     dispatch({ type: 'ADD_PATIENT', payload: newPatient });
 
-    toast({
-      title: "Senha Gerada!",
-      description: `Senha ${number} gerada com sucesso`,
-    });
+    // Prepara dados do ticket
+    const ticket: TicketData = {
+      number,
+      employeeBadge: badgeToSave,
+      employeeName: nameToSave,
+      timestamp: new Date(),
+    };
 
-    // Impressão térmica via RawBT (Android) com ESC/POS
-    try {
-      await printThermalTicket({
-        number,
-        employeeBadge: badgeToSave,
-        employeeName: nameToSave,
-        timestamp: new Date(),
-      });
-    } catch (err) {
-      console.error('Erro ao imprimir senha:', err);
-      toast({
-        title: "Erro na Impressão",
-        description: "Falha ao imprimir a senha. Verifique a impressora térmica.",
-        variant: "destructive",
-      });
+    // Detecção de plataforma: Android imprime via RawBT, outros browsers exibem preview
+    const isRealDevice = isRealAndroidDevice();
+    console.log('[SICFAR] isAndroid():', isAndroid(), '| isRealDevice:', isRealDevice, '| hostname:', window.location.hostname);
+    if (isRealDevice) {
+      // Impressão térmica via RawBT (Android) com ESC/POS
+      try {
+        // Marca que devemos restaurar fullscreen ao retornar do RawBT
+        try { sessionStorage.setItem('SICFAR_FS_RESTORE', '1'); } catch {}
+        await printThermalTicket(ticket);
+      } catch (err) {
+        console.error('Erro ao imprimir senha:', err);
+      }
+      // Reset do fluxo para Android (após impressão)
+      setEmployeeBadge('');
+      setEmployeeName('');
+      setVisitorName('');
+      setBadgeValid(null);
+      setPersonType(null);
+      setStep(1);
+    } else {
+      // Browser não-Android: exibe modal com preview do ticket térmico
+      // O reset será feito quando o modal for fechado
+      setTicketData(ticket);
+      setShowTicketPreview(true);
     }
-
-    // Reset do fluxo
-    setEmployeeBadge('');
-    setEmployeeName('');
-    setVisitorName('');
-    setBadgeValid(null);
-    setPersonType(null);
-    setStep(1);
   };
 
   return (
@@ -595,6 +581,96 @@ const Tablet = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Dialog para preview do ticket térmico (apenas browser não-Android) */}
+      <Dialog open={showTicketPreview} onOpenChange={setShowTicketPreview}>
+        <DialogContent className="max-w-xs p-0 bg-transparent border-none shadow-2xl">
+          <div className="bg-[#F5F1E8] rounded-lg shadow-2xl overflow-hidden">
+            {/* Simulação de papel térmico - Otimizado para 1000x500 */}
+            <div className="p-4 space-y-2 font-mono text-black">
+              {/* Logo */}
+              <div className="flex justify-center mb-2">
+                <img
+                  src="/farmace.png"
+                  alt="Farmace"
+                  className="h-10 object-contain"
+                />
+              </div>
+
+              {/* Cabeçalho */}
+              <div className="text-center">
+                <h2 className="text-xs font-bold leading-tight">
+                  ATENDIMENTO AMBULATORIAL
+                </h2>
+              </div>
+
+              {/* Separador */}
+              <div className="border-t-2 border-dashed border-black/20 my-2"></div>
+
+              {/* Número da senha (destaque) */}
+              <div className="text-center py-3">
+                <div className="text-3xl font-bold tracking-wider">
+                  {ticketData?.number}
+                </div>
+              </div>
+
+              {/* Separador */}
+              <div className="border-t-2 border-dashed border-black/20 my-2"></div>
+
+              {/* Dados do paciente */}
+              <div className="space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Matrícula:</span>
+                  <span>{ticketData?.employeeBadge}</span>
+                </div>
+                {ticketData?.employeeName && (
+                  <div className="flex flex-col">
+                    <span className="font-semibold">Paciente:</span>
+                    <span className="text-[10px] break-words leading-tight">{ticketData.employeeName}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Separador */}
+              <div className="border-t-2 border-dashed border-black/20 my-2"></div>
+
+              {/* Data/Hora */}
+              <div className="text-center text-[10px]">
+                {ticketData?.timestamp && new Intl.DateTimeFormat('pt-BR', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                }).format(ticketData.timestamp)}
+              </div>
+
+              {/* Rodapé */}
+              <div className="text-center text-[10px] pt-2 pb-1">
+                <div className="font-semibold">SICFAR Clinic - FARMACE</div>
+              </div>
+            </div>
+
+            {/* Botão Fechar */}
+            <div className="p-2 bg-[#F5F1E8] border-t border-black/10">
+              <Button
+                onClick={() => {
+                  setShowTicketPreview(false);
+                  setTicketData(null);
+                  // Reset do fluxo após fechar o preview
+                  setEmployeeBadge('');
+                  setEmployeeName('');
+                  setVisitorName('');
+                  setBadgeValid(null);
+                  setPersonType(null);
+                  setStep(1);
+                }}
+                className="w-full h-8 text-xs"
+                size="sm"
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

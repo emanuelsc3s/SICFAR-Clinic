@@ -12,8 +12,24 @@ export interface TicketData {
   timestamp: Date;
 }
 
-function isAndroid(): boolean {
+export function isAndroid(): boolean {
   return typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+}
+
+// Verifica se é realmente um dispositivo Android físico (não emulação ou browser desktop)
+// Retorna true apenas se for Android E não estiver rodando em localhost (desenvolvimento)
+export function isRealAndroidDevice(): boolean {
+  const isAndroidUA = isAndroid();
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+     window.location.hostname === '127.0.0.1' ||
+     window.location.hostname.startsWith('192.168.') ||
+     window.location.hostname.startsWith('10.') ||
+     window.location.hostname.startsWith('172.'));
+
+  // Se é Android mas está em localhost, provavelmente é emulação/dev
+  // Retorna true apenas se for Android E NÃO for localhost
+  return isAndroidUA && !isLocalhost;
 }
 
 function uint8ToBase64(u8: Uint8Array): string {
