@@ -41,6 +41,7 @@ const Tablet = () => {
 
   // Estado para controle do prompt de fullscreen
   const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
+  const [showAutoActivating, setShowAutoActivating] = useState(false);
 
   // Refs para controle de scroll quando teclado abre
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
@@ -141,9 +142,36 @@ const Tablet = () => {
 
           if (!alreadyInFullscreen) {
             // Não está em fullscreen após retornar do RawBT
-            // Exibe o prompt para o usuário reativar
-            console.log('[SICFAR] Fullscreen perdido após RawBT, exibindo prompt');
-            setShowFullscreenPrompt(true);
+            // Aguarda 1.5 segundos e então simula um clique automático para ativar fullscreen
+            console.log('[SICFAR] Fullscreen perdido após RawBT, ativando automaticamente em 1.5s...');
+
+            // Exibe indicador visual de ativação automática
+            setShowAutoActivating(true);
+
+            setTimeout(() => {
+              console.log('[SICFAR] Simulando clique automático para ativar fullscreen');
+
+              // Simula um clique no documento para satisfazer a restrição de "user gesture"
+              const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+              });
+              document.documentElement.dispatchEvent(clickEvent);
+
+              // Tenta ativar fullscreen logo após o clique simulado
+              setTimeout(async () => {
+                try {
+                  await ensureFullscreen(false);
+                  console.log('[SICFAR] Fullscreen ativado automaticamente após retorno do RawBT');
+                  setShowAutoActivating(false);
+                } catch (err) {
+                  console.warn('[SICFAR] Falha ao ativar fullscreen automaticamente, exibindo prompt');
+                  setShowAutoActivating(false);
+                  setShowFullscreenPrompt(true);
+                }
+              }, 100);
+            }, 1500);
           } else {
             console.log('[SICFAR] Fullscreen mantido após RawBT');
           }
@@ -839,6 +867,40 @@ const Tablet = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Indicador de Ativação Automática - Aparece por 1.5s após retornar do RawBT */}
+      {showAutoActivating && isAndroid() && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6 animate-fade-in pointer-events-none">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
+                <svg
+                  className="w-10 h-10 text-primary animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-gray-900">
+                Ativando Tela Cheia...
+              </h2>
+              <p className="text-sm text-gray-600">
+                Aguarde um momento
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Prompt de Fullscreen - Aparece apenas em Android quando fullscreen não está ativo */}
       {showFullscreenPrompt && isAndroid() && (
