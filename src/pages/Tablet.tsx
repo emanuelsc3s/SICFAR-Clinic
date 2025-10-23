@@ -39,6 +39,10 @@ const Tablet = () => {
   const [showTicketPreview, setShowTicketPreview] = useState(false);
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
 
+  // Estado para controle do prompt de fullscreen
+  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
+  const [fullscreenActivated, setFullscreenActivated] = useState(false);
+
   // Refs para controle de scroll quando teclado abre
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
@@ -87,12 +91,20 @@ const Tablet = () => {
       if (!already) {
         await requestFullscreen(el);
         tryHideAddressBar();
+        setFullscreenActivated(true);
+        setShowFullscreenPrompt(false);
+        console.log('[SICFAR] Fullscreen ativado com sucesso');
       }
-    } catch {
+    } catch (err) {
       // Alguns navegadores (ex.: Opera Mini) podem não suportar a Fullscreen API
+      console.warn('[SICFAR] Fullscreen não suportado ou bloqueado:', err);
       tryHideAddressBar();
+      // Se falhar, mostra o prompt para o usuário tentar novamente
+      if (!fullscreenActivated) {
+        setShowFullscreenPrompt(true);
+      }
     }
-  }, []);
+  }, [fullscreenActivated]);
 
   const handleUserGestureForFullscreen = useCallback(() => {
     if (!isAndroid()) return;
@@ -101,11 +113,20 @@ const Tablet = () => {
     }
   }, [ensureFullscreen]);
 
+  // Handler para ativar fullscreen via prompt inicial
+  const handleActivateFullscreen = useCallback(async () => {
+    console.log('[SICFAR] Usuário tocou para ativar fullscreen');
+    await ensureFullscreen();
+  }, [ensureFullscreen]);
+
+  // Effect principal: gerencia fullscreen e exibe prompt se necessário
   useEffect(() => {
+    if (!isAndroid()) return;
+
     const key = 'SICFAR_FS_RESTORE';
+    const promptKey = 'SICFAR_FS_PROMPT_SHOWN';
 
     const onRestore = () => {
-      if (!isAndroid()) return;
       if (document.visibilityState === 'visible') {
         // Tentamos sempre que voltar para a aba; a flag melhora o sinal do retorno do RawBT
         const should = (() => {
@@ -124,8 +145,39 @@ const Tablet = () => {
     window.addEventListener('focus', onRestore);
     window.addEventListener('pageshow', onRestore);
 
-    // Tenta ativar fullscreen logo após montar (pode ser ignorado se exigir gesto do usuário)
-    const t = setTimeout(() => { void ensureFullscreen(); }, 300);
+    // Tenta ativar fullscreen logo após montar
+    const attemptAutoFullscreen = async () => {
+      const alreadyInFullscreen = !!getFullscreenElement();
+
+      if (alreadyInFullscreen) {
+        console.log('[SICFAR] Já está em fullscreen');
+        setFullscreenActivated(true);
+        setShowFullscreenPrompt(false);
+        return;
+      }
+
+      // Primeira tentativa automática (pode falhar por restrição de segurança)
+      try {
+        await ensureFullscreen();
+        console.log('[SICFAR] Fullscreen ativado automaticamente');
+      } catch (err) {
+        console.warn('[SICFAR] Tentativa automática de fullscreen falhou:', err);
+
+        // Verifica se já mostrou o prompt nesta sessão
+        const promptShown = (() => {
+          try { return sessionStorage.getItem(promptKey); } catch (e) { return null; }
+        })();
+
+        // Se nunca mostrou o prompt, exibe agora
+        if (!promptShown) {
+          console.log('[SICFAR] Exibindo prompt de fullscreen');
+          setShowFullscreenPrompt(true);
+          try { sessionStorage.setItem(promptKey, '1'); } catch (e) { void e; }
+        }
+      }
+    };
+
+    const t = setTimeout(attemptAutoFullscreen, 300);
 
     return () => {
       clearTimeout(t);
@@ -762,6 +814,51 @@ const Tablet = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Prompt de Fullscreen - Aparece apenas em Android quando fullscreen não está ativo */}
+      {showFullscreenPrompt && isAndroid() && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6 animate-fade-in"
+          onClick={handleActivateFullscreen}
+          onTouchStart={handleActivateFullscreen}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-12 h-12 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Modo Tela Cheia
+              </h2>
+              <p className="text-base text-gray-600 leading-relaxed">
+                Para melhor experiência, toque na tela para ativar o modo tela cheia
+              </p>
+            </div>
+
+            <div className="pt-4">
+              <div className="inline-flex items-center gap-2 text-primary font-semibold animate-pulse">
+                <span className="text-lg">👆</span>
+                <span>Toque em qualquer lugar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
