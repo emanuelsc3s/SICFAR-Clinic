@@ -59,66 +59,121 @@ const Tablet = () => {
     return document.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement || null;
   };
 
-  const requestFullscreen = async (el: HTMLElement) => {
+  const requestFullscreen = useCallback(async (el: HTMLElement): Promise<boolean> => {
     const anyEl = el as HTMLElement & {
       webkitRequestFullscreen?: () => Promise<void> | void;
       mozRequestFullScreen?: () => Promise<void> | void;
       msRequestFullscreen?: () => Promise<void> | void;
     };
+    const maybeAwait = async (value: Promise<void> | void) => {
+      if (value && typeof (value as Promise<void>).then === 'function') {
+        await value;
+      }
+    };
+
     try {
-      if (el.requestFullscreen) return await el.requestFullscreen();
-      if (anyEl.webkitRequestFullscreen) return await anyEl.webkitRequestFullscreen();
-      if (anyEl.mozRequestFullScreen) return await anyEl.mozRequestFullScreen();
-      if (anyEl.msRequestFullscreen) return await anyEl.msRequestFullscreen();
+      if (el.requestFullscreen) {
+        await el.requestFullscreen();
+        return true;
+      }
+      if (anyEl.webkitRequestFullscreen) {
+        await maybeAwait(anyEl.webkitRequestFullscreen());
+        return true;
+      }
+      if (anyEl.mozRequestFullScreen) {
+        await maybeAwait(anyEl.mozRequestFullScreen());
+        return true;
+      }
+      if (anyEl.msRequestFullscreen) {
+        await maybeAwait(anyEl.msRequestFullscreen());
+        return true;
+      }
     } catch (e) {
-      console.warn('[SICFAR] Falha ao entrar em fullscreen:', e);
+      console.warn('[SICFAR] Falha ao requisitar fullscreen:', e);
       throw e;
     }
-  };
 
-  const tryHideAddressBar = () => {
+    return false;
+  }, []);
+
+  const tryHideAddressBar = useCallback(() => {
     // Hack antigo para esconder a barra de endereço em navegadores antigos
     setTimeout(() => {
       try { window.scrollTo(0, 1); } catch (e) { void e; }
     }, 200);
-  };
+  }, []);
 
-  const ensureFullscreen = useCallback(async (showPromptOnFail = false) => {
-    if (!isAndroid()) return;
-    try {
-      const el = document.documentElement as HTMLElement;
+  const ensureFullscreen = useCallback(
+    async ({ allowPromptOnFail = false, reason = 'generic' }: { allowPromptOnFail?: boolean; reason?: string } = {}) => {
+      if (!isAndroid()) return true;
+
       const already = !!getFullscreenElement();
-      if (!already) {
-        await requestFullscreen(el);
-        tryHideAddressBar();
+      if (already) {
         setShowFullscreenPrompt(false);
-        console.log('[SICFAR] Fullscreen ativado com sucesso');
-      } else {
-        console.log('[SICFAR] Fullscreen já está ativo');
+        return true;
       }
-    } catch (err) {
-      // Alguns navegadores (ex.: Opera Mini) podem não suportar a Fullscreen API
-      console.warn('[SICFAR] Fullscreen não suportado ou bloqueado:', err);
+
+      const candidates = [
+        document.documentElement,
+        document.body,
+        document.getElementById('root'),
+        document.getElementById('app'),
+      ].filter((el): el is HTMLElement => !!el);
+
+      let lastError: unknown = null;
+      for (const candidate of candidates) {
+        try {
+          const invoked = await requestFullscreen(candidate);
+          if (!invoked) {
+            continue;
+          }
+
+          // Aguarda o navegador efetivar a transição para fullscreen
+          await new Promise((resolve) => setTimeout(resolve, 30));
+
+          if (getFullscreenElement()) {
+            tryHideAddressBar();
+            setShowFullscreenPrompt(false);
+            console.log(`[SICFAR] Fullscreen ativado (motivo: ${reason})`);
+            return true;
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      if (lastError) {
+        console.warn(`[SICFAR] Fullscreen bloqueado (${reason}):`, lastError);
+      } else {
+        console.warn(`[SICFAR] Fullscreen não pôde ser ativado (${reason})`);
+      }
+
       tryHideAddressBar();
-      // Se falhar e showPromptOnFail=true, mostra o prompt para o usuário tentar novamente
-      if (showPromptOnFail) {
+
+      if (allowPromptOnFail) {
         console.log('[SICFAR] Exibindo prompt de fullscreen após falha');
         setShowFullscreenPrompt(true);
       }
-    }
-  }, []);
+
+      return false;
+    },
+    [requestFullscreen, tryHideAddressBar]
+  );
 
   const handleUserGestureForFullscreen = useCallback(() => {
     if (!isAndroid()) return;
     if (!getFullscreenElement()) {
-      void ensureFullscreen();
+      void ensureFullscreen({ reason: 'gesture-capture' });
     }
   }, [ensureFullscreen]);
 
   // Handler para ativar fullscreen via prompt inicial
   const handleActivateFullscreen = useCallback(async () => {
     console.log('[SICFAR] Usuário tocou para ativar fullscreen');
-    await ensureFullscreen();
+    const success = await ensureFullscreen({ reason: 'prompt-tap' });
+    if (!success) {
+      console.warn('[SICFAR] Ainda sem fullscreen após gesto do usuário');
+    }
   }, [ensureFullscreen]);
 
   // Effect principal: gerencia fullscreen e exibe prompt se necessário
@@ -127,61 +182,81 @@ const Tablet = () => {
 
     const key = 'SICFAR_FS_RESTORE';
 
-    const onRestore = () => {
-      if (document.visibilityState === 'visible') {
-        // Verifica se voltou do RawBT (flag setada antes de imprimir)
-        const shouldRestore = (() => {
-          try { return sessionStorage.getItem(key); } catch (e) { return null; }
-        })();
+    const scheduledTimeouts: number[] = [];
 
-        const alreadyInFullscreen = !!getFullscreenElement();
+    const clearScheduledTimeouts = () => {
+      scheduledTimeouts.forEach((id) => window.clearTimeout(id));
+      scheduledTimeouts.length = 0;
+    };
 
-        if (shouldRestore === '1') {
-          console.log('[SICFAR] Retornou do RawBT, verificando fullscreen...');
-          try { sessionStorage.removeItem(key); } catch (e) { void e; }
+    const runFullscreenRecovery = (
+      reason: string,
+      {
+        allowPromptAtEnd = true,
+        showIndicator = false,
+        delays = [120, 600, 1400, 2600],
+      }: { allowPromptAtEnd?: boolean; showIndicator?: boolean; delays?: number[] } = {}
+    ) => {
+      clearScheduledTimeouts();
 
-          if (!alreadyInFullscreen) {
-            // Não está em fullscreen após retornar do RawBT
-            // Aguarda 5.0 segundos e então simula um clique automático para ativar fullscreen
-            console.log('[SICFAR] Fullscreen perdido após RawBT, ativando automaticamente em 5.0s...');
+      if (showIndicator) {
+        setShowAutoActivating(true);
+      }
 
-            // Exibe indicador visual de ativação automática
-            setShowAutoActivating(true);
+      // Oculta o prompt enquanto novas tentativas automáticas são realizadas
+      setShowFullscreenPrompt(false);
 
-            setTimeout(() => {
-              console.log('[SICFAR] Simulando clique automático para ativar fullscreen');
+      let resolved = false;
 
-              // Simula um clique no documento para satisfazer a restrição de "user gesture"
-              const clickEvent = new MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: true
-              });
-              document.documentElement.dispatchEvent(clickEvent);
+      delays.forEach((delay, index) => {
+        const timeoutId = window.setTimeout(async () => {
+          if (resolved) return;
 
-              // Tenta ativar fullscreen logo após o clique simulado
-              setTimeout(async () => {
-                try {
-                  await ensureFullscreen(false);
-                  console.log('[SICFAR] Fullscreen ativado automaticamente após retorno do RawBT');
-                  setShowAutoActivating(false);
-                } catch (err) {
-                  console.warn('[SICFAR] Falha ao ativar fullscreen automaticamente, exibindo prompt');
-                  setShowAutoActivating(false);
-                  setShowFullscreenPrompt(true);
-                }
-              }, 7000);
-            }, 7000);
-          } else {
-            console.log('[SICFAR] Fullscreen mantido após RawBT');
+          const isLastAttempt = index === delays.length - 1;
+          const success = await ensureFullscreen({
+            allowPromptOnFail: allowPromptAtEnd && isLastAttempt,
+            reason: `${reason}-tentativa-${index + 1}`,
+          });
+
+          if (success) {
+            resolved = true;
+            setShowAutoActivating(false);
+            clearScheduledTimeouts();
+            return;
           }
-        } else if (!alreadyInFullscreen) {
-          // Voltou ao foco mas não está em fullscreen (sem ser do RawBT)
-          // Tenta reativar silenciosamente
-          console.log('[SICFAR] Página voltou ao foco sem fullscreen, tentando reativar...');
-          setTimeout(() => { void ensureFullscreen(true); }, 120);
-          setTimeout(() => { void ensureFullscreen(true); }, 500);
+
+          if (isLastAttempt) {
+            setShowAutoActivating(false);
+          }
+        }, delay);
+
+        scheduledTimeouts.push(timeoutId);
+      });
+    };
+
+    const onRestore = () => {
+      if (document.visibilityState !== 'visible') return;
+
+      const alreadyInFullscreen = !!getFullscreenElement();
+      const shouldRestore = (() => {
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+      })();
+
+      if (shouldRestore === '1') {
+        console.log('[SICFAR] Retornou do RawBT, revalidando fullscreen...');
+        try { sessionStorage.removeItem(key); } catch (e) { void e; }
+
+        if (!alreadyInFullscreen) {
+          runFullscreenRecovery('rawbt-retorno', { allowPromptAtEnd: true, showIndicator: true });
+        } else {
+          console.log('[SICFAR] Fullscreen mantido após retorno do RawBT');
         }
+        return;
+      }
+
+      if (!alreadyInFullscreen) {
+        console.log('[SICFAR] Página voltou ao foco sem fullscreen, tentando novamente...');
+        runFullscreenRecovery('retorno-foreground', { allowPromptAtEnd: true });
       }
     };
 
@@ -189,38 +264,33 @@ const Tablet = () => {
     window.addEventListener('focus', onRestore);
     window.addEventListener('pageshow', onRestore);
 
-    // Tenta ativar fullscreen logo após montar
-    const attemptAutoFullscreen = async () => {
-      const alreadyInFullscreen = !!getFullscreenElement();
-
-      if (alreadyInFullscreen) {
-        console.log('[SICFAR] Já está em fullscreen');
-        setShowFullscreenPrompt(false);
-        return;
-      }
-
-      // Primeira tentativa automática (pode falhar por restrição de segurança)
-      console.log('[SICFAR] Tentando ativar fullscreen automaticamente...');
-      try {
-        await ensureFullscreen(false);
-        console.log('[SICFAR] Fullscreen ativado automaticamente');
-      } catch (err) {
-        console.warn('[SICFAR] Tentativa automática de fullscreen falhou:', err);
-        // Exibe o prompt para o usuário ativar manualmente
-        console.log('[SICFAR] Exibindo prompt de fullscreen inicial');
-        setShowFullscreenPrompt(true);
-      }
-    };
-
-    const t = setTimeout(attemptAutoFullscreen, 300);
+    if (!getFullscreenElement()) {
+      const initialTimeout = window.setTimeout(() => {
+        if (!getFullscreenElement()) {
+          console.log('[SICFAR] Tentativa inicial de fullscreen no carregamento');
+          runFullscreenRecovery('montagem-inicial', { allowPromptAtEnd: true });
+        }
+      }, 300);
+      scheduledTimeouts.push(initialTimeout);
+    }
 
     return () => {
-      clearTimeout(t);
+      clearScheduledTimeouts();
       document.removeEventListener('visibilitychange', onRestore);
       window.removeEventListener('focus', onRestore);
       window.removeEventListener('pageshow', onRestore);
     };
   }, [ensureFullscreen]);
+
+  useEffect(() => {
+    if (!showFullscreenPrompt || !isAndroid()) return;
+    const vibrate = navigator.vibrate?.bind(navigator);
+    try {
+      vibrate?.([120, 80, 180]);
+    } catch (err) {
+      console.debug('[SICFAR] Vibração indisponível:', err);
+    }
+  }, [showFullscreenPrompt]);
 
 
   // Lista hardcoded de colaboradores para testes
@@ -395,7 +465,12 @@ const Tablet = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in overflow-hidden" onClickCapture={handleUserGestureForFullscreen} onTouchStartCapture={handleUserGestureForFullscreen}>
+    <div
+      className="h-screen bg-gradient-subtle p-1.5 lg:p-3 xl:p-6 font-inter animate-fade-in overflow-hidden"
+      onClickCapture={handleUserGestureForFullscreen}
+      onTouchStartCapture={handleUserGestureForFullscreen}
+      onPointerDownCapture={handleUserGestureForFullscreen}
+    >
       <div className="max-w-6xl mx-auto h-full flex flex-col">
         {/* Header - Ultra Compacto para 1000x500 */}
         <div className="text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0">
@@ -849,10 +924,9 @@ const Tablet = () => {
                   console.log('[SICFAR] Verificando fullscreen após fechar preview');
                   setTimeout(async () => {
                     if (!getFullscreenElement()) {
-                      try {
-                        await ensureFullscreen(false);
-                      } catch (err) {
-                        console.log('[SICFAR] Fullscreen bloqueado, exibindo prompt');
+                      const success = await ensureFullscreen({ reason: 'fechar-preview' });
+                      if (!success) {
+                        console.log('[SICFAR] Fullscreen bloqueado após fechar preview, exibindo prompt');
                         setShowFullscreenPrompt(true);
                       }
                     }
@@ -868,7 +942,7 @@ const Tablet = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Indicador de Ativação Automática - Aparece por 1.5s após retornar do RawBT */}
+      {/* Indicador de Ativação Automática - informa que o sistema está tentando restaurar fullscreen */}
       {showAutoActivating && isAndroid() && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6 animate-fade-in pointer-events-none">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center space-y-4">
@@ -892,10 +966,10 @@ const Tablet = () => {
 
             <div className="space-y-2">
               <h2 className="text-xl font-bold text-gray-900">
-                Ativando Tela Cheia...
+                Tentando restaurar o modo tela cheia
               </h2>
-              <p className="text-sm text-gray-600">
-                Aguarde um momento
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Isso pode levar alguns segundos após retornar da impressão.
               </p>
             </div>
           </div>
@@ -906,8 +980,18 @@ const Tablet = () => {
       {showFullscreenPrompt && isAndroid() && (
         <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6 animate-fade-in"
+          role="button"
+          tabIndex={0}
+          aria-label="Ativar modo tela cheia"
           onClick={handleActivateFullscreen}
           onTouchStart={handleActivateFullscreen}
+          onPointerDown={handleActivateFullscreen}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              void handleActivateFullscreen();
+            }
+          }}
         >
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center space-y-6">
             <div className="flex justify-center">
@@ -930,17 +1014,27 @@ const Tablet = () => {
 
             <div className="space-y-3">
               <h2 className="text-2xl font-bold text-gray-900">
-                Modo Tela Cheia
+                Ativar modo tela cheia
               </h2>
               <p className="text-base text-gray-600 leading-relaxed">
-                Para melhor experiência, toque na tela para ativar o modo tela cheia
+                O Chrome exige um toque manual após voltar da impressão. Toque em qualquer lugar para continuar a experiência.
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2 flex flex-col items-center gap-4">
+              <Button
+                size="lg"
+                className="px-10 text-lg"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void handleActivateFullscreen();
+                }}
+              >
+                Ativar agora
+              </Button>
               <div className="inline-flex items-center gap-2 text-primary font-semibold animate-pulse">
                 <span className="text-lg">👆</span>
-                <span>Toque em qualquer lugar</span>
+                <span>Qualquer toque ativa o modo tela cheia</span>
               </div>
             </div>
           </div>
