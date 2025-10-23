@@ -54,6 +54,13 @@ function sizeDoubleWH(): Uint8Array { return new Uint8Array([GS, 0x21, 0x11]); }
 function lf(lines = 1): Uint8Array { return new Uint8Array(Array(lines).fill(0x0a)); }
 function cut(): Uint8Array { return new Uint8Array([GS, 0x56, 0x01]); } // GS V 1 (partial cut; ignorado se não houver)
 
+// Seleciona página de código para caracteres (ESC t n)
+// OBS: Muitos modelos aceitam n=65 para UTF-8. Alternativas comuns para PT-BR:
+//  - 3  = PC860 (Português)
+//  - 19 = PC858 (Europa Ocidental com €)
+//  - 16 = Windows-1252
+function selectCodePage(n: number): Uint8Array { return new Uint8Array([ESC, 0x74, n]); } // ESC t n
+
 
 // Largura máxima típica (58mm): 384 pontos
 const PRINTER_MAX_WIDTH_DOTS = 384;
@@ -137,6 +144,9 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
 
   const chunks: Uint8Array[] = [];
   chunks.push(init());
+  // Define pagina de codigo para UTF-8 (ESC t 65). Caso sua impressora nao suporte UTF-8,
+  // ajuste o valor (ex.: 3=PC860, 19=PC858, 16=Windows-1252).
+  chunks.push(selectCodePage(65));
   chunks.push(alignCenter());
 
   // Logotipo no topo (raster GS v 0)
