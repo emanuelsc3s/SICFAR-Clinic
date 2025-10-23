@@ -180,7 +180,7 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(lf(10));
 
   // Demais linhas
-  chunks.push(text(`Matrícula: ${data.employeeBadge}`));
+  chunks.push(text(`Matricula: ${data.employeeBadge}`));
   chunks.push(lf());
   if (data.employeeName) {
     chunks.push(text(`Paciente: ${data.employeeName}`));
@@ -191,6 +191,9 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
 
   // Espaçamento extra no final para dobrar a altura total
   chunks.push(lf(60));
+
+  chunks.push(text(`SICFAR Clinic - FARMACE`));
+  chunks.push(lf());
 
   // Corte
   chunks.push(cut());
