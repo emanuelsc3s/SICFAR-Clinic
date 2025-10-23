@@ -167,20 +167,20 @@ const Tablet = () => {
       <div className="max-w-6xl mx-auto h-full flex flex-col">
         {/* Header - Ultra Compacto para 1000x500 */}
         <div className="text-center mb-1 lg:mb-3 xl:mb-6 animate-scale-in flex-shrink-0">
-          <div className="flex items-center justify-center gap-1.5 lg:gap-3 xl:gap-4">
+          <div className="flex flex-col items-center justify-center gap-2 lg:gap-4 xl:gap-6 pt-8 lg:pt-16 xl:pt-20">
             <img
               src="/farmace.png"
               alt="Farmace"
-              className="h-8 lg:h-16 xl:h-24 drop-shadow-lg"
+              className="h-12 lg:h-24 xl:h-32 drop-shadow-lg"
             />
-            <h1 className="text-base lg:text-2xl xl:text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent leading-tight">
-              Ambulatório - Senha de Atendimento
+            <h1 className="text-base lg:text-2xl xl:text-4xl font-bold text-primary leading-tight">
+              Atendimento Ambulatorial
             </h1>
           </div>
         </div>
 
         {/* Wizard: Indicador de Progresso - Ultra Compacto para 1000x500 */}
-        <div className="px-2 lg:px-6 py-1 lg:py-3 xl:py-4 mb-1 lg:mb-3 xl:mb-6 flex-shrink-0">
+        <div className="px-2 lg:px-6 pt-6 lg:pt-8 xl:pt-10 pb-1 lg:pb-3 xl:pb-4 mb-1 lg:mb-3 xl:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between max-w-3xl mx-auto">
             {/* Etapa 1 */}
             <div className="flex flex-col items-center flex-1">
@@ -260,7 +260,7 @@ const Tablet = () => {
         {/* Etapas do Wizard */}
         <div className="flex-1 flex items-center justify-center px-2 lg:px-6 xl:px-8 overflow-y-auto min-h-0">
           {step === 1 && (
-            <div className="w-full max-w-3xl space-y-2 lg:space-y-4 xl:space-y-8 py-1">
+            <div className="w-[400px] space-y-2 lg:space-y-4 xl:space-y-8 py-1">
               {/* Botão Visitante - Ultra Compacto para 1000x500, mantém touch 44x44px */}
               <Card
                 className="cursor-pointer transition-all duration-200 active:scale-95 bg-primary border-0 shadow-xl"
