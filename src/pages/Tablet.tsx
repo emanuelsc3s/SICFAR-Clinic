@@ -29,11 +29,27 @@ const Tablet = () => {
 
   const { state, dispatch } = useQueue();
 
-  // Mock simples de colaboradores - substituir por integração com Supabase
+  // Lista hardcoded de colaboradores para testes
+  // Formato: matrícula (6 dígitos) + nome completo (ignorando data no final)
   const MOCK_COLABS: Record<string, string> = {
-    '1001': 'Maria Souza',
-    '1002': 'João Santos',
-    '2001': 'Ana Lima',
+    '000406': 'CICERO ROGÉRIO DOS SANTOS MAIA',
+    '002085': 'LUIS FERNANDO DOS SANTOS SOUZA',
+    '002913': 'GERVALDO DOS SANTOS DA SILVA JUNIOR',
+    '002866': 'ALISON JOSE DE MELO SILVA',
+    '000648': 'CICERO EMANUEL DA SILVA',
+    '002846': 'PAULO VINICIUS FERREIRA FRANCELINO',
+    '003899': 'SAMUEL YAN GOMES MARQUES',
+    '004230': 'ANDERSON FILIPE LEITE ROCHA',
+    '002082': 'ANDERSON ROBERTO SANTOS BEZERRA',
+    '004211': 'RENATO BARBOSA DA SILVA',
+    '003166': 'ALISSON NAVDE DOS SANTOS',
+    '004151': 'LUIZ HENRIQUE TEIXEIRA SAMPAIO',
+    '003694': 'ALEX SILVA SANTOS',
+    '004029': 'ROGERIO CARLOS LOIOLA JUNIOR',
+    '004231': 'BRUNO SOARES DE LIMA',
+    '002349': 'THIAGO PAIXAO SARAIVA',
+    '003194': 'EDUARDO LUIZ ARAGÃO BARIVIERA MOREIRA',
+    '004511': 'PAULO GUILHERME DE SOUSA DA SILVA',
   };
 
   // Função para scroll suave até o elemento quando o teclado abre
@@ -92,7 +108,11 @@ const Tablet = () => {
     }
     setLoadingBadge(true);
     try {
-      const name = await lookupEmployeeByBadge(employeeBadge);
+      // Normaliza a matrícula: adiciona zeros à esquerda para completar 6 dígitos
+      // Exemplos: "406" → "000406", "2085" → "002085", "4230" → "004230"
+      const normalizedBadge = employeeBadge.trim().padStart(6, '0');
+
+      const name = await lookupEmployeeByBadge(normalizedBadge);
       if (name) {
         setEmployeeName(name);
         setBadgeValid(true);
