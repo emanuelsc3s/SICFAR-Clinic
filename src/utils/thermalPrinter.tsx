@@ -198,10 +198,10 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
   chunks.push(lf(2));
 
   // Espaçamento extra no final para dobrar a altura total
-  chunks.push(lf(60));
+  chunks.push(lf(40));
 
   chunks.push(text(`SICFAR Clinic - FARMACE`));
-  chunks.push(lf());
+  chunks.push(lf(10));
 
   // Corte
   chunks.push(cut());
