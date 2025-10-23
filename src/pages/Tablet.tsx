@@ -163,44 +163,44 @@ const Tablet = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-subtle p-3 sm:p-4 md:p-6 font-inter animate-fade-in overflow-hidden">
+    <div className="h-screen bg-gradient-subtle p-2 sm:p-3 md:p-6 font-inter animate-fade-in overflow-hidden">
       <div className="max-w-6xl mx-auto h-full flex flex-col">
-        {/* Header - Otimizado para Tablet (1280x800) */}
-        <div className="text-center mb-4 sm:mb-6 animate-scale-in">
-          <div className="flex items-center justify-center gap-3 sm:gap-4">
+        {/* Header - Compacto para 1280x800 */}
+        <div className="text-center mb-2 sm:mb-3 md:mb-6 animate-scale-in flex-shrink-0">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-4">
             <img
               src="/farmace.png"
               alt="Farmace"
-              className="h-16 sm:h-20 md:h-24 drop-shadow-lg"
+              className="h-12 sm:h-16 md:h-24 drop-shadow-lg"
             />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               Ambulatório - Senha de Atendimento
             </h1>
           </div>
         </div>
 
-        {/* Wizard: Indicador de Progresso com Círculos - Otimizado para Touch */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 mb-4 sm:mb-6">
+        {/* Wizard: Indicador de Progresso - Compacto para 1280x800 */}
+        <div className="px-4 sm:px-6 py-2 sm:py-3 md:py-4 mb-2 sm:mb-3 md:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between max-w-3xl mx-auto">
             {/* Etapa 1 */}
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
+                  "w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl md:text-2xl transition-all duration-200 mb-1 sm:mb-2",
                   step >= 1
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 1 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "1"}
+                {step > 1 ? <Check className="w-6 h-6 sm:w-7 sm:h-7 md:w-10 md:h-10" /> : "1"}
               </div>
-              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
+              <span className="text-xs sm:text-sm md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Tipo de<br />Pessoa
               </span>
             </div>
 
             {/* Linha conectora 1-2 */}
-            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-8 sm:mb-10 md:mb-12 rounded-full">
+            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-6 sm:mb-8 md:mb-12 rounded-full">
               <div
                 className={cn(
                   "h-full transition-all duration-200 rounded-full",
@@ -214,21 +214,21 @@ const Tablet = () => {
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
+                  "w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl md:text-2xl transition-all duration-200 mb-1 sm:mb-2",
                   step >= 2
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 2 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "2"}
+                {step > 2 ? <Check className="w-6 h-6 sm:w-7 sm:h-7 md:w-10 md:h-10" /> : "2"}
               </div>
-              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
+              <span className="text-xs sm:text-sm md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Identificação
               </span>
             </div>
 
             {/* Linha conectora 2-3 */}
-            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-8 sm:mb-10 md:mb-12 rounded-full">
+            <div className="flex-1 h-1 bg-muted mx-2 sm:mx-3 mb-6 sm:mb-8 md:mb-12 rounded-full">
               <div
                 className={cn(
                   "h-full transition-all duration-200 rounded-full",
@@ -242,15 +242,15 @@ const Tablet = () => {
             <div className="flex flex-col items-center flex-1">
               <div
                 className={cn(
-                  "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-xl sm:text-2xl transition-all duration-200 mb-2 sm:mb-3",
+                  "w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl md:text-2xl transition-all duration-200 mb-1 sm:mb-2",
                   step >= 3
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "bg-muted text-muted-foreground border-2 border-muted"
                 )}
               >
-                {step > 3 ? <Check className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" /> : "3"}
+                {step > 3 ? <Check className="w-6 h-6 sm:w-7 sm:h-7 md:w-10 md:h-10" /> : "3"}
               </div>
-              <span className="text-sm sm:text-base md:text-lg font-medium text-center text-foreground/80 leading-tight">
+              <span className="text-xs sm:text-sm md:text-lg font-medium text-center text-foreground/80 leading-tight">
                 Tipo de<br />Senha
               </span>
             </div>
@@ -258,10 +258,10 @@ const Tablet = () => {
         </div>
 
         {/* Etapas do Wizard */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-y-auto">
           {step === 1 && (
-            <div className="w-full max-w-3xl space-y-5 sm:space-y-6 md:space-y-8">
-              {/* Botão Visitante - Otimizado para Touch (min 44x44px) */}
+            <div className="w-full max-w-3xl space-y-3 sm:space-y-4 md:space-y-8 py-2">
+              {/* Botão Visitante - Compacto para 1280x800, mantém touch 44x44px */}
               <Card
                 className="cursor-pointer transition-all duration-200 active:scale-95 bg-primary border-0 shadow-xl"
                 onClick={() => {
@@ -273,14 +273,14 @@ const Tablet = () => {
                   setStep(2);
                 }}
               >
-                <CardContent className="p-6 sm:p-8 md:p-10 min-h-[88px]">
-                  <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-                    <div className="p-4 sm:p-5 md:p-6 rounded-2xl bg-white">
-                      <User className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-primary" />
+                <CardContent className="p-4 sm:p-6 md:p-10 min-h-[88px]">
+                  <div className="flex items-center gap-3 sm:gap-4 md:gap-8">
+                    <div className="p-3 sm:p-4 md:p-6 rounded-2xl bg-white flex-shrink-0">
+                      <User className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white">Visitante</h3>
-                      <p className="text-base sm:text-lg md:text-xl text-white/90">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl sm:text-2xl md:text-4xl font-bold mb-1 sm:mb-2 text-white">Visitante</h3>
+                      <p className="text-sm sm:text-base md:text-xl text-white/90 leading-tight">
                         Para pessoas sem matrícula de colaborador
                       </p>
                     </div>
@@ -288,7 +288,7 @@ const Tablet = () => {
                 </CardContent>
               </Card>
 
-              {/* Botão Colaborador - Otimizado para Touch (min 44x44px) */}
+              {/* Botão Colaborador - Compacto para 1280x800, mantém touch 44x44px */}
               <Card
                 className="cursor-pointer transition-all duration-200 active:scale-95 bg-primary border-0 shadow-xl"
                 onClick={() => {
@@ -297,14 +297,14 @@ const Tablet = () => {
                   setStep(2);
                 }}
               >
-                <CardContent className="p-6 sm:p-8 md:p-10 min-h-[88px]">
-                  <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-                    <div className="p-4 sm:p-5 md:p-6 rounded-2xl bg-white">
-                      <IdCard className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-primary" />
+                <CardContent className="p-4 sm:p-6 md:p-10 min-h-[88px]">
+                  <div className="flex items-center gap-3 sm:gap-4 md:gap-8">
+                    <div className="p-3 sm:p-4 md:p-6 rounded-2xl bg-white flex-shrink-0">
+                      <IdCard className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white">Colaborador</h3>
-                      <p className="text-base sm:text-lg md:text-xl text-white/90">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl sm:text-2xl md:text-4xl font-bold mb-1 sm:mb-2 text-white">Colaborador</h3>
+                      <p className="text-sm sm:text-base md:text-xl text-white/90 leading-tight">
                         Para funcionários com matrícula cadastrada
                       </p>
                     </div>
