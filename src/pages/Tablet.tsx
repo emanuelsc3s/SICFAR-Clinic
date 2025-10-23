@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +23,10 @@ const Tablet = () => {
   const [loadingBadge, setLoadingBadge] = useState(false);
   const [badgeValid, setBadgeValid] = useState<boolean | null>(null);
 
+  // Refs para controle de scroll quando teclado abre
+  const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
+  const visitorNameInputRef = useRef<HTMLInputElement>(null);
+
   const { state, dispatch } = useQueue();
 
   // Mock simples de colaboradores - substituir por integração com Supabase
@@ -31,6 +35,35 @@ const Tablet = () => {
     '1002': 'João Santos',
     '2001': 'Ana Lima',
   };
+
+  // Função para scroll suave até o elemento quando o teclado abre
+  // Especialmente útil para Android 7 onde o teclado cobre o campo
+  const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
+    if (inputRef.current) {
+      // Aguarda um pequeno delay para o teclado começar a abrir
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center', // Centraliza o campo na viewport
+          inline: 'nearest'
+        });
+      }, 300); // 300ms é suficiente para detectar a abertura do teclado
+    }
+  };
+
+  // Efeito para focar automaticamente nos campos quando entrar na etapa 2
+  useEffect(() => {
+    if (step === 2) {
+      // Foca no campo apropriado após um pequeno delay para garantir que o DOM foi atualizado
+      setTimeout(() => {
+        if (personType === 'colaborador' && employeeBadgeInputRef.current) {
+          employeeBadgeInputRef.current.focus();
+        } else if (personType === 'visitante' && visitorNameInputRef.current) {
+          visitorNameInputRef.current.focus();
+        }
+      }, 100);
+    }
+  }, [step, personType]);
 
   const lookupEmployeeByBadge = async (badge: string): Promise<string | null> => {
     await new Promise((res) => setTimeout(res, 400));
@@ -329,6 +362,7 @@ const Tablet = () => {
                   </label>
                   <div className="flex gap-3">
                     <Input
+                      ref={employeeBadgeInputRef}
                       type="number"
                       id="cracha"
                       name="cracha"
@@ -338,6 +372,7 @@ const Tablet = () => {
                         setBadgeValid(null);
                         setEmployeeName('');
                       }}
+                      onFocus={() => scrollToInput(employeeBadgeInputRef)}
                       placeholder="Digite a matrícula"
                       className="flex-1 h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                       required
@@ -406,11 +441,13 @@ const Tablet = () => {
                     Nome do Visitante
                   </label>
                   <Input
+                    ref={visitorNameInputRef}
                     type="text"
                     id="nome-visitante"
                     name="nome-visitante"
                     value={visitorName}
                     onChange={(e) => setVisitorName(e.target.value)}
+                    onFocus={() => scrollToInput(visitorNameInputRef)}
                     placeholder="Digite o nome completo"
                     className="h-12 sm:h-14 md:h-16 text-base sm:text-lg md:text-xl px-4 sm:px-5"
                     required
