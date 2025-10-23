@@ -190,6 +190,9 @@ export async function buildTicketESCPOSEncoded(data: TicketData): Promise<Uint8A
     chunks.push(text(`Paciente: ${data.employeeName}`));
     chunks.push(lf());
   }
+  
+  chunks.push(lf(10)); // Espaço após o Paciente
+
   chunks.push(alignCenter()); // restaura alinhamento central para as próximas linhas
   chunks.push(text(dateTime));
   chunks.push(lf(2));
