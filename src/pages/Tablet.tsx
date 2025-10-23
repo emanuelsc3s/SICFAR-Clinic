@@ -363,8 +363,8 @@ const Tablet = () => {
             <CardContent className="p-6 sm:p-8 md:p-10">
 
             {step === 2 && personType === 'colaborador' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
                   <label htmlFor="cracha" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
                     Matrícula
@@ -406,7 +406,7 @@ const Tablet = () => {
                   )}
                 </div>
 
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-2">
                   <label htmlFor="nome-colab" className="text-base sm:text-lg md:text-xl font-medium text-foreground flex items-center gap-2 sm:gap-3">
                     <User className="w-5 h-5 sm:w-6 sm:h-6" />
                     Nome do Colaborador
@@ -423,7 +423,7 @@ const Tablet = () => {
                   />
                 </div>
 
-                <div className="col-span-full flex justify-between gap-4 pt-4 sm:pt-6">
+                <div className="col-span-full flex justify-between gap-4">
                   <Button
                     variant="secondary"
                     onClick={() => setStep(1)}
