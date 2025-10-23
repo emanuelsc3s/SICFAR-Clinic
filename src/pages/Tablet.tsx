@@ -170,8 +170,8 @@ const Tablet = () => {
                   setShowAutoActivating(false);
                   setShowFullscreenPrompt(true);
                 }
-              }, 100);
-            }, 5000);
+              }, 7000);
+            }, 7000);
           } else {
             console.log('[SICFAR] Fullscreen mantido após RawBT');
           }
