@@ -83,7 +83,7 @@ const Tablet = () => {
     }, 200);
   };
 
-  const ensureFullscreen = useCallback(async () => {
+  const ensureFullscreen = useCallback(async (silent = false) => {
     if (!isAndroid()) return;
     try {
       const el = document.documentElement as HTMLElement;
@@ -94,13 +94,15 @@ const Tablet = () => {
         setFullscreenActivated(true);
         setShowFullscreenPrompt(false);
         console.log('[SICFAR] Fullscreen ativado com sucesso');
+      } else {
+        console.log('[SICFAR] Fullscreen já está ativo');
       }
     } catch (err) {
       // Alguns navegadores (ex.: Opera Mini) podem não suportar a Fullscreen API
       console.warn('[SICFAR] Fullscreen não suportado ou bloqueado:', err);
       tryHideAddressBar();
-      // Se falhar, mostra o prompt para o usuário tentar novamente
-      if (!fullscreenActivated) {
+      // Se falhar e não for modo silencioso, mostra o prompt para o usuário tentar novamente
+      if (!fullscreenActivated && !silent) {
         setShowFullscreenPrompt(true);
       }
     }
@@ -338,9 +340,16 @@ const Tablet = () => {
         // Marca que devemos restaurar fullscreen ao retornar do RawBT
         try { sessionStorage.setItem('SICFAR_FS_RESTORE', '1'); } catch (e) { void e; }
         await printThermalTicket(ticket);
+
+        // Reativa fullscreen imediatamente após impressão (modo silencioso - sem prompt)
+        console.log('[SICFAR] Reativando fullscreen após impressão');
+        setTimeout(() => {
+          void ensureFullscreen(true); // true = modo silencioso
+        }, 100);
       } catch (err) {
         console.error('Erro ao imprimir senha:', err);
       }
+
       // Reset do fluxo para Android (após impressão)
       setEmployeeBadge('');
       setEmployeeName('');
@@ -797,6 +806,13 @@ const Tablet = () => {
                 onClick={() => {
                   setShowTicketPreview(false);
                   setTicketData(null);
+
+                  // Reativa fullscreen após fechar o preview (modo silencioso - sem prompt)
+                  console.log('[SICFAR] Reativando fullscreen após fechar preview');
+                  setTimeout(() => {
+                    void ensureFullscreen(true); // true = modo silencioso
+                  }, 100);
+
                   // Reset do fluxo após fechar o preview
                   setEmployeeBadge('');
                   setEmployeeName('');
