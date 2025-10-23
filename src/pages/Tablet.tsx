@@ -316,39 +316,50 @@ const Tablet = () => {
     '004511': 'PAULO GUILHERME DE SOUSA DA SILVA',
   };
 
-  // Função para scroll suave até o elemento quando o teclado abre
+  // Função para scroll até o elemento quando o teclado abre
   // Especialmente útil para Android 7 onde o teclado cobre o campo
-  // Usa múltiplas tentativas de scroll para garantir que funcione no primeiro toque
+  // Usa múltiplas tentativas com scroll instantâneo (sem animação) para máxima confiabilidade
   const scrollToInput = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (!inputRef.current) return;
 
-    // Primeira tentativa: scroll imediato usando requestAnimationFrame
-    // Isso garante que o scroll aconteça após o próximo repaint do navegador
-    requestAnimationFrame(() => {
-      inputRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
-    });
+    const element = inputRef.current;
 
-    // Segunda tentativa: após 350ms (tempo para o teclado começar a abrir no Android 7)
-    setTimeout(() => {
-      inputRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
-    }, 350);
+    // Função auxiliar para fazer o scroll de forma mais agressiva
+    const performScroll = () => {
+      if (!element) return;
 
-    // Terceira tentativa: após 600ms (garantia para teclados mais lentos)
-    setTimeout(() => {
-      inputRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
+      // Método 1: scrollIntoView sem animação (mais confiável no Android)
+      element.scrollIntoView({
+        behavior: 'auto', // 'auto' em vez de 'smooth' para scroll instantâneo
+        block: 'start',   // 'start' em vez de 'center' para garantir que fique no topo
         inline: 'nearest'
       });
-    }, 600);
+
+      // Método 2: scroll manual usando getBoundingClientRect (fallback)
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - 100; // 100px de margem do topo
+
+      window.scrollTo({
+        top: targetY,
+        behavior: 'auto'
+      });
+    };
+
+    // Tentativa 1: Imediata
+    performScroll();
+
+    // Tentativa 2: Após 100ms
+    setTimeout(performScroll, 100);
+
+    // Tentativa 3: Após 300ms
+    setTimeout(performScroll, 300);
+
+    // Tentativa 4: Após 500ms (quando o teclado já deve estar abrindo)
+    setTimeout(performScroll, 500);
+
+    // Tentativa 5: Após 800ms (garantia final)
+    setTimeout(performScroll, 800);
   };
 
   // Auto-foco removido: deixamos o usuário decidir quando tocar no campo
