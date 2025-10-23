@@ -68,6 +68,7 @@ const Tablet = () => {
       await printThermalTicket({
         number,
         employeeBadge: employeeBadge.trim(),
+          employeeName: employeeName.trim(),
         timestamp: new Date(),
       });
     } catch (err) {
