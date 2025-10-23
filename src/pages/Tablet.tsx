@@ -58,8 +58,12 @@ const Tablet = () => {
       setTimeout(() => {
         if (personType === 'colaborador' && employeeBadgeInputRef.current) {
           employeeBadgeInputRef.current.focus();
+          // Chama o scroll após o foco para garantir que o campo fique visível quando o teclado abrir
+          scrollToInput(employeeBadgeInputRef);
         } else if (personType === 'visitante' && visitorNameInputRef.current) {
           visitorNameInputRef.current.focus();
+          // Chama o scroll após o foco para garantir que o campo fique visível quando o teclado abrir
+          scrollToInput(visitorNameInputRef);
         }
       }, 100);
     }
