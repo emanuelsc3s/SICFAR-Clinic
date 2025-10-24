@@ -1,4 +1,6 @@
 
+import { useEffect } from "react";
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,7 +22,7 @@ const queryClient = new QueryClient();
 const PwaBootstrap = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const mm = window.matchMedia?.bind(window);
       const standalone = (mm && (mm('(display-mode: standalone)').matches || mm('(display-mode: fullscreen)').matches))
