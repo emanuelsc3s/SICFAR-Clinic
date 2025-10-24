@@ -56,6 +56,7 @@ const Tablet = () => {
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
   const stepTwoContainerRef = useRef<HTMLDivElement>(null);
   const gestureRecoveryRef = useRef<{ cleanup: () => void } | null>(null);
+  const rawbtRecoveryCooldownRef = useRef<number>(0);
 
   const isLegacyKeyboardMode = isLegacyAndroid && isLegacyKeyboardVisible;
 
@@ -230,11 +231,10 @@ const Tablet = () => {
 
   const handleUserGestureForFullscreen = useCallback(() => {
     if (!isAndroid()) return;
-    detachGestureRecovery();
     if (!getFullscreenElement()) {
       void ensureFullscreen({ reason: 'gesture-capture' });
     }
-  }, [detachGestureRecovery, ensureFullscreen]);
+  }, [ensureFullscreen]);
 
   // Handler para ativar fullscreen via prompt inicial
   const handleActivateFullscreen = useCallback(async () => {
@@ -300,6 +300,7 @@ const Tablet = () => {
             setShowAutoActivating(false);
             clearScheduledTimeouts();
             detachGestureRecovery();
+            rawbtRecoveryCooldownRef.current = 0;
             return;
           }
 
@@ -332,11 +333,22 @@ const Tablet = () => {
         try { sessionStorage.removeItem(key); } catch (e) { void e; }
 
         if (!alreadyInFullscreen) {
-          runFullscreenRecovery('rawbt-retorno', {
-            allowPromptAtEnd: true,
-            showIndicator: true,
-            preferGestureFallback: true,
-          });
+          rawbtRecoveryCooldownRef.current = Date.now() + 6000;
+
+          void (async () => {
+            const immediate = await ensureFullscreen({ reason: 'rawbt-retorno-imediato' });
+            if (immediate) {
+              setShowAutoActivating(false);
+              rawbtRecoveryCooldownRef.current = 0;
+              return;
+            }
+
+            runFullscreenRecovery('rawbt-retorno', {
+              allowPromptAtEnd: true,
+              showIndicator: true,
+              preferGestureFallback: true,
+            });
+          })();
         } else {
           console.log('[SICFAR] Fullscreen mantido após retorno do RawBT');
         }
@@ -344,6 +356,12 @@ const Tablet = () => {
       }
 
       if (!alreadyInFullscreen) {
+        const now = Date.now();
+        if (rawbtRecoveryCooldownRef.current && now < rawbtRecoveryCooldownRef.current) {
+          console.log('[SICFAR] Aguardando gesto após RawBT, adiando prompt de fullscreen');
+          return;
+        }
+
         console.log('[SICFAR] Página voltou ao foco sem fullscreen, tentando novamente...');
         runFullscreenRecovery('retorno-foreground', { allowPromptAtEnd: true });
       }
@@ -389,6 +407,7 @@ const Tablet = () => {
       if (getFullscreenElement()) {
         setShowFullscreenPrompt(false);
         setShowAutoActivating(false);
+        rawbtRecoveryCooldownRef.current = 0;
       }
       detachGestureRecovery();
     };
