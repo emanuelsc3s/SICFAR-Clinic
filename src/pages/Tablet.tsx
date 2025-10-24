@@ -116,9 +116,25 @@ const Tablet = () => {
     }, 200);
   }, []);
 
+  // Detecta se o app está rodando instalado como PWA em fullscreen/standalone
+  const isStandalone = () => {
+    try {
+      const mm = window.matchMedia?.bind(window);
+      const standalone = (mm && (mm('(display-mode: standalone)').matches || mm('(display-mode: fullscreen)').matches))
+        || (navigator as any)?.standalone === true;
+      return !!standalone;
+    } catch {
+      return false;
+    }
+  };
+
   const ensureFullscreen = useCallback(
     async ({ allowPromptOnFail = false, reason = 'generic' }: { allowPromptOnFail?: boolean; reason?: string } = {}) => {
       if (!isAndroid()) return true;
+      if (isStandalone()) {
+        setShowFullscreenPrompt(false);
+        return true;
+      }
 
       const already = !!getFullscreenElement();
       if (already) {
@@ -1285,7 +1301,7 @@ const Tablet = () => {
       </Dialog>
 
       {/* Indicador de Ativação Automática - informa que o sistema está tentando restaurar fullscreen */}
-      {showAutoActivating && isAndroid() && (
+      {showAutoActivating && isAndroid() && !isStandalone() && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6 animate-fade-in pointer-events-none">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center space-y-4">
             <div className="flex justify-center">
@@ -1319,7 +1335,7 @@ const Tablet = () => {
       )}
 
       {/* Prompt de Fullscreen - Aparece apenas em Android quando fullscreen não está ativo */}
-      {showFullscreenPrompt && isAndroid() && (
+      {showFullscreenPrompt && isAndroid() && !isStandalone() && (
         <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6 animate-fade-in"
           role="button"
