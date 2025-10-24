@@ -55,6 +55,7 @@ const Tablet = () => {
   const employeeBadgeInputRef = useRef<HTMLInputElement>(null);
   const visitorNameInputRef = useRef<HTMLInputElement>(null);
   const stepTwoContainerRef = useRef<HTMLDivElement>(null);
+  const gestureRecoveryRef = useRef<{ cleanup: () => void } | null>(null);
 
   const isLegacyKeyboardMode = isLegacyAndroid && isLegacyKeyboardVisible;
 
@@ -171,21 +172,79 @@ const Tablet = () => {
     [requestFullscreen, tryHideAddressBar]
   );
 
+  const detachGestureRecovery = useCallback(() => {
+    if (!gestureRecoveryRef.current) return;
+    try {
+      gestureRecoveryRef.current.cleanup();
+    } finally {
+      gestureRecoveryRef.current = null;
+    }
+  }, []);
+
+  const scheduleGestureRecovery = useCallback(
+    (
+      reason: string,
+      {
+        maxAttempts = 2,
+        showPromptOnFail = true,
+      }: { maxAttempts?: number; showPromptOnFail?: boolean } = {},
+      attempt = 0
+    ) => {
+      if (!isAndroid()) return;
+
+      detachGestureRecovery();
+      setShowFullscreenPrompt(false);
+
+      const handler = async () => {
+        detachGestureRecovery();
+        const nextAttempt = attempt + 1;
+        const success = await ensureFullscreen({ reason: `${reason}-gesture-${nextAttempt}` });
+        if (success) {
+          setShowAutoActivating(false);
+          return;
+        }
+
+        if (nextAttempt >= maxAttempts) {
+          if (showPromptOnFail) {
+            setShowFullscreenPrompt(true);
+          }
+          return;
+        }
+
+        scheduleGestureRecovery(reason, { maxAttempts, showPromptOnFail }, nextAttempt);
+      };
+
+      const cleanup = () => {
+        document.removeEventListener('pointerdown', handler, true);
+        document.removeEventListener('touchstart', handler, true);
+        document.removeEventListener('keydown', handler, true);
+      };
+
+      gestureRecoveryRef.current = { cleanup };
+      document.addEventListener('pointerdown', handler, true);
+      document.addEventListener('touchstart', handler, true);
+      document.addEventListener('keydown', handler, true);
+    },
+    [detachGestureRecovery, ensureFullscreen]
+  );
+
   const handleUserGestureForFullscreen = useCallback(() => {
     if (!isAndroid()) return;
+    detachGestureRecovery();
     if (!getFullscreenElement()) {
       void ensureFullscreen({ reason: 'gesture-capture' });
     }
-  }, [ensureFullscreen]);
+  }, [detachGestureRecovery, ensureFullscreen]);
 
   // Handler para ativar fullscreen via prompt inicial
   const handleActivateFullscreen = useCallback(async () => {
     console.log('[SICFAR] Usuário tocou para ativar fullscreen');
+    detachGestureRecovery();
     const success = await ensureFullscreen({ reason: 'prompt-tap' });
     if (!success) {
       console.warn('[SICFAR] Ainda sem fullscreen após gesto do usuário');
     }
-  }, [ensureFullscreen]);
+  }, [detachGestureRecovery, ensureFullscreen]);
 
   // Effect principal: gerencia fullscreen e exibe prompt se necessário
   useEffect(() => {
@@ -206,9 +265,16 @@ const Tablet = () => {
         allowPromptAtEnd = true,
         showIndicator = false,
         delays = [120, 600, 1400, 2600],
-      }: { allowPromptAtEnd?: boolean; showIndicator?: boolean; delays?: number[] } = {}
+        preferGestureFallback = false,
+      }: {
+        allowPromptAtEnd?: boolean;
+        showIndicator?: boolean;
+        delays?: number[];
+        preferGestureFallback?: boolean;
+      } = {}
     ) => {
       clearScheduledTimeouts();
+      detachGestureRecovery();
 
       if (showIndicator) {
         setShowAutoActivating(true);
@@ -225,7 +291,7 @@ const Tablet = () => {
 
           const isLastAttempt = index === delays.length - 1;
           const success = await ensureFullscreen({
-            allowPromptOnFail: allowPromptAtEnd && isLastAttempt,
+            allowPromptOnFail: allowPromptAtEnd && isLastAttempt && !preferGestureFallback,
             reason: `${reason}-tentativa-${index + 1}`,
           });
 
@@ -233,11 +299,19 @@ const Tablet = () => {
             resolved = true;
             setShowAutoActivating(false);
             clearScheduledTimeouts();
+            detachGestureRecovery();
             return;
           }
 
           if (isLastAttempt) {
             setShowAutoActivating(false);
+            if (allowPromptAtEnd) {
+              if (preferGestureFallback) {
+                scheduleGestureRecovery(reason, { maxAttempts: 2, showPromptOnFail: true });
+              } else {
+                setShowFullscreenPrompt(true);
+              }
+            }
           }
         }, delay);
 
@@ -258,7 +332,11 @@ const Tablet = () => {
         try { sessionStorage.removeItem(key); } catch (e) { void e; }
 
         if (!alreadyInFullscreen) {
-          runFullscreenRecovery('rawbt-retorno', { allowPromptAtEnd: true, showIndicator: true });
+          runFullscreenRecovery('rawbt-retorno', {
+            allowPromptAtEnd: true,
+            showIndicator: true,
+            preferGestureFallback: true,
+          });
         } else {
           console.log('[SICFAR] Fullscreen mantido após retorno do RawBT');
         }
@@ -291,7 +369,7 @@ const Tablet = () => {
       window.removeEventListener('focus', onRestore);
       window.removeEventListener('pageshow', onRestore);
     };
-  }, [ensureFullscreen]);
+  }, [ensureFullscreen, scheduleGestureRecovery, detachGestureRecovery]);
 
   useEffect(() => {
     if (!showFullscreenPrompt || !isAndroid()) return;
@@ -302,6 +380,31 @@ const Tablet = () => {
       console.debug('[SICFAR] Vibração indisponível:', err);
     }
   }, [showFullscreenPrompt]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!isAndroid()) return;
+
+    const handleFullscreenChange = () => {
+      if (getFullscreenElement()) {
+        setShowFullscreenPrompt(false);
+        setShowAutoActivating(false);
+      }
+      detachGestureRecovery();
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange as EventListener);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange as EventListener);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange as EventListener);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange as EventListener);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange as EventListener);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange as EventListener);
+    };
+  }, [detachGestureRecovery]);
 
 
   // Lista hardcoded de colaboradores para testes
@@ -511,8 +614,9 @@ const Tablet = () => {
       if (keyboardVisibilityTimeout.current) {
         window.clearTimeout(keyboardVisibilityTimeout.current);
       }
+      detachGestureRecovery();
     };
-  }, []);
+  }, [detachGestureRecovery]);
 
   const lookupEmployeeByBadge = async (badge: string): Promise<string | null> => {
     await new Promise((res) => setTimeout(res, 400));
