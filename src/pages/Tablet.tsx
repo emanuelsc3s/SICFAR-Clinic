@@ -266,11 +266,15 @@ const Tablet = () => {
         showIndicator = false,
         delays = [120, 600, 1400, 2600],
         preferGestureFallback = false,
+        gesturePromptOnFail = true,
+        gestureWhenStart = false,
       }: {
         allowPromptAtEnd?: boolean;
         showIndicator?: boolean;
         delays?: number[];
         preferGestureFallback?: boolean;
+        gesturePromptOnFail?: boolean;
+        gestureWhenStart?: boolean;
       } = {}
     ) => {
       clearScheduledTimeouts();
@@ -282,6 +286,11 @@ const Tablet = () => {
 
       // Oculta o prompt enquanto novas tentativas automáticas são realizadas
       setShowFullscreenPrompt(false);
+
+      // Se preferimos gesto como fallback, já armamos o capturador no início (opcional)
+      if (preferGestureFallback && gestureWhenStart) {
+        scheduleGestureRecovery(reason, { maxAttempts: 2, showPromptOnFail: gesturePromptOnFail });
+      }
 
       let resolved = false;
 
@@ -308,7 +317,11 @@ const Tablet = () => {
             setShowAutoActivating(false);
             if (allowPromptAtEnd) {
               if (preferGestureFallback) {
-                scheduleGestureRecovery(reason, { maxAttempts: 2, showPromptOnFail: true });
+                // Se não armamos no início, armamos agora o fallback por gesto
+                if (!gestureWhenStart) {
+                  scheduleGestureRecovery(reason, { maxAttempts: 2, showPromptOnFail: gesturePromptOnFail });
+                }
+                // Não mostramos o prompt aqui; o próprio fallback por gesto decide se precisa
               } else {
                 setShowFullscreenPrompt(true);
               }
@@ -344,9 +357,11 @@ const Tablet = () => {
             }
 
             runFullscreenRecovery('rawbt-retorno', {
-              allowPromptAtEnd: true,
+              allowPromptAtEnd: false,
               showIndicator: true,
               preferGestureFallback: true,
+              gesturePromptOnFail: false,
+              gestureWhenStart: true,
             });
           })();
         } else {
